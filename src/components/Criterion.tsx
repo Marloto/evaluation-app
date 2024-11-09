@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ChevronDown, ChevronRight, PenSquare, RotateCcw, Check } from 'lucide-react'
 import { Option } from '@/types'
+import StarRating from './StarRating';
 
 interface CriterionProps {
   title: string;
@@ -28,13 +29,13 @@ const Criterion = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [tempCustomText, setTempCustomText] = useState(customText || '');
-  
+
   const hasValue = value !== undefined;
   const selectedOption = options.find(opt => opt.score === value);
 
   const handleOptionSelect = (score: number) => {
     const option = options.find(opt => opt.score === score);
-    onUpdate({ 
+    onUpdate({
       score,
       customText: option?.text || ''
     });
@@ -57,7 +58,7 @@ const Criterion = ({
     <Card className={`mb-4 ${hasValue ? 'ring-1 ring-green-500' : ''}`}>
       <div className="p-4">
         {/* Header Section */}
-        <button 
+        <button
           className="w-full flex items-center justify-between hover:text-green-600 transition-colors"
           onClick={() => setIsExpanded(!isExpanded)}
         >
@@ -70,9 +71,12 @@ const Criterion = ({
             <span className="font-medium">{title}</span>
           </div>
           {hasValue && (
-            <span className="text-sm text-gray-500">
-              Score: {value}
-            </span>
+            <div className="flex items-center gap-2">
+              <StarRating score={value} size="sm" />
+              <span className="text-sm text-gray-500">
+                ({value})
+              </span>
+            </div>
           )}
         </button>
 
@@ -140,14 +144,16 @@ const Criterion = ({
                 <button
                   key={option.score}
                   onClick={() => handleOptionSelect(option.score)}
-                  className={`w-full p-4 rounded-md text-left transition-colors hover:bg-gray-50 ${
-                    option.score === value
-                      ? 'bg-green-50 text-green-700 ring-1 ring-green-500'
-                      : 'bg-white border'
-                  }`}
+                  className={`w-full p-4 rounded-md text-left transition-colors hover:bg-gray-50 ${option.score === value
+                    ? 'bg-green-50 text-green-700 ring-1 ring-green-500'
+                    : 'bg-white border'
+                    }`}
                 >
                   <div className="flex justify-between items-center mb-1">
-                    <span className="font-medium">Score {option.score}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Score {option.score}</span>
+                      <StarRating score={option.score} size="sm" />
+                    </div>
                     {option.score === value && (
                       <Check className="h-4 w-4 text-green-600" />
                     )}

@@ -1,9 +1,9 @@
 "use client"
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
-import { Settings, RotateCcw } from 'lucide-react';
+import { Settings, RotateCcw, Download, Upload } from 'lucide-react';
 import { useConfig } from './ConfigProvider';
 import { EvaluationStateProvider, useEvaluationState } from './EvaluationStateProvider';
 import Criterion from './Criterion';
@@ -14,18 +14,103 @@ import { PenSquare } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import ResetConfirmDialog from './dialogs/ResetConfirmDialog';
 
+import { format } from 'date-fns';
+import { toast } from "sonner";  // shadcn verwendet sonner für Toasts
+
+// Typ für die gespeicherte Konfiguration
+interface SavedConfiguration {
+    version: string;
+    timestamp: string;
+    config: any;
+    evaluationState: any;
+}
+
+// Helper Funktionen für den Download
+const downloadJson = (data: any, filename: string) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
 const EvaluationContent = () => {
-    const { config } = useConfig();
+    const { config, updateConfig } = useConfig();
     const {
         state,
         updateCriterion,
         updatePreamble,
         setActiveSection,
-        resetAll
+        resetAll,
+        loadState  // Neue Funktion hinzugefügt
     } = useEvaluationState();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [editingPreamble, setEditingPreamble] = useState<string | null>(null);
+    const [preambleText, setPreambleText] = useState<string>('');
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Funktion zum Herunterladen der aktuellen Konfiguration
+    const handleDownload = () => {
+        const savedConfig: SavedConfiguration = {
+            version: "1.0",
+            timestamp: new Date().toISOString(),
+            config,
+            evaluationState: state  // Nutze existierenden state
+        };
+
+        const filename = `thesis-evaluation-${format(new Date(), 'yyyy-MM-dd-HH-mm')}.json`;
+        downloadJson(savedConfig, filename);
+    };
+
+    // Funktion zum Hochladen einer Konfiguration
+    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target?.result as string;
+                const savedConfig: SavedConfiguration = JSON.parse(content);
+
+                if (!savedConfig.version || !savedConfig.config || !savedConfig.evaluationState) {
+                    throw new Error('Invalid configuration file format');
+                }
+
+                updateConfig(savedConfig.config);
+                loadState(savedConfig.evaluationState);
+
+                toast.success('Configuration loaded successfully');
+            } catch (error) {
+                console.error('Error loading configuration:', error);
+                toast.error('Error loading configuration file');
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    // Wird beim Start des Editierens aufgerufen
+    const startEditingPreamble = (sectionKey: string) => {
+        setPreambleText(state.sections[sectionKey]?.preamble || '');
+        setEditingPreamble(sectionKey);
+    };
+
+    // Wird bei jeder Texteingabe aufgerufen
+    const handlePreambleChange = (text: string) => {
+        setPreambleText(text);
+    };
+
+    // Wird nur beim Speichern aufgerufen
+    const handlePreambleSave = (sectionKey: string) => {
+        updatePreamble(sectionKey, preambleText);
+        setEditingPreamble(null);
+    };
 
     // Calculate validation state for each section
     const sectionValidation = useMemo(() => {
@@ -46,11 +131,14 @@ const EvaluationContent = () => {
             let totalWeight = 0;
 
             Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
-                const score = sectionState?.criteria[criterionKey]?.score;
-                if (score !== undefined) {
-                    sectionScore += score * criterion.weight;
-                    totalWeight += criterion.weight;
+                // Skip criteria marked with excludeFromTotal
+                if (criterion.excludeFromTotal) {
+                    return;
                 }
+
+                const score = sectionState?.criteria[criterionKey]?.score ?? 0;
+                sectionScore += score * criterion.weight;
+                totalWeight += criterion.weight;
             });
 
             validation[sectionKey] = {
@@ -110,11 +198,15 @@ const EvaluationContent = () => {
             const sectionState = state.sections[sectionKey];
 
             Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
-                const score = sectionState?.criteria[criterionKey]?.score;
-                if (score !== undefined) {
-                    totalScore += score * criterion.weight * section.weight;
-                    totalWeight += criterion.weight * section.weight;
+                // Skip criteria marked with excludeFromTotal
+                if (criterion.excludeFromTotal) {
+                    return;
                 }
+
+                // Use 0 as default score for unselected criteria
+                const score = sectionState?.criteria[criterionKey]?.score ?? 0;
+                totalScore += score * criterion.weight * section.weight;
+                totalWeight += criterion.weight * section.weight;
             });
         });
 
@@ -144,11 +236,26 @@ const EvaluationContent = () => {
             {editingPreamble === sectionKey ? (
                 <div className="mb-4">
                     <Textarea
-                        value={state.sections[sectionKey]?.preamble || ''}
-                        onChange={(e) => handlePreambleUpdate(sectionKey, e.target.value)}
+                        value={preambleText}
+                        onChange={(e) => handlePreambleChange(e.target.value)}
                         placeholder="Enter a preamble for this section..."
                         className="min-h-[100px]"
                     />
+                    <div className="flex justify-end gap-2 mt-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingPreamble(null)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={() => handlePreambleSave(sectionKey)}
+                        >
+                            Save
+                        </Button>
+                    </div>
                 </div>
             ) : state.sections[sectionKey]?.preamble && (
                 <div className="mb-4 p-3 bg-gray-50 rounded-md">
@@ -188,6 +295,7 @@ const EvaluationContent = () => {
                             onSectionSelect={setActiveSection}
                             finalGrade={calculateGrade()}
                             generatedTexts={generatedTexts}
+                            evaluationState={state} // Neue Prop
                         />
                     </div>
 
@@ -196,6 +304,29 @@ const EvaluationContent = () => {
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle>Select Criterions</CardTitle>
                                 <div className="flex items-center space-x-2">
+                                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleUpload}
+                  accept=".json"
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownload}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
                                     <Button
                                         variant="destructive"
                                         size="sm"
@@ -232,13 +363,13 @@ const EvaluationContent = () => {
                 onToggle={() => setIsSidebarOpen(!isSidebarOpen)}
             />
 
-            <ResetConfirmDialog 
-              isOpen={isResetDialogOpen}
-              onClose={() => setIsResetDialogOpen(false)}
-              onConfirm={() => {
-                resetAll();
-                setIsResetDialogOpen(false);
-              }}
+            <ResetConfirmDialog
+                isOpen={isResetDialogOpen}
+                onClose={() => setIsResetDialogOpen(false)}
+                onConfirm={() => {
+                    resetAll();
+                    setIsResetDialogOpen(false);
+                }}
             />
         </div>
     );

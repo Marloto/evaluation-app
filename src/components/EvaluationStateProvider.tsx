@@ -26,6 +26,7 @@ interface EvaluationContextType {
     setActiveSection: (sectionKey: string | null) => void;
     resetSection: (sectionKey: string) => void;
     resetAll: () => void;
+    loadState: (newState: EvaluationState) => void; // Neue Funktion
 }
 
 const EvaluationContext = createContext<EvaluationContextType | undefined>(undefined);
@@ -153,6 +154,10 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
         setState(createInitialState(sections));
     };
 
+    const loadState = (newState: EvaluationState) => {
+        setState(newState);
+    };
+
     return (
         <EvaluationContext.Provider
             value={{
@@ -161,7 +166,8 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
                 updatePreamble,
                 setActiveSection,
                 resetSection,
-                resetAll
+                resetAll,
+                loadState // Neue Funktion
             }}
         >
             {children}

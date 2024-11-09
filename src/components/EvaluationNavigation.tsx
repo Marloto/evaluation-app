@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  ChevronRight, 
-  CheckCircle2, 
+import {
+  ChevronRight,
+  CheckCircle2,
   AlertCircle,
   Loader2,
   FileText,
+  BarChart2,
   X
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
@@ -20,6 +21,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Section } from '@/types';
+import AnalyticsDialog from './dialogs/AnalyticsDialog';
+import StarRating from './StarRating';
 
 interface NavigationProps {
   sections: { [key: string]: Section };
@@ -35,6 +38,20 @@ interface NavigationProps {
   onSectionSelect: (sectionKey: string) => void;
   finalGrade: string;
   generatedTexts: { [key: string]: string };
+  evaluationState: {
+    sections: {
+      [key: string]: {
+        preamble?: string;
+        criteria: {
+          [key: string]: {
+            score?: number;
+            customText?: string;
+          };
+        };
+      };
+    };
+    activeSection: string | null;
+  };
 }
 
 const EvaluationNavigation = ({
@@ -43,10 +60,35 @@ const EvaluationNavigation = ({
   activeSection,
   onSectionSelect,
   finalGrade,
-  generatedTexts
+  generatedTexts,
+  evaluationState
 }: NavigationProps) => {
   const [showFullText, setShowFullText] = useState(false);
-  
+  const [showAnalytics, setShowAnalytics] = useState(false);
+
+  // Calculate score distribution
+  const calculateScoreDistribution = () => {
+    const distribution: { [key: number]: number } = {
+      0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+    };
+
+    // Wenn kein evaluationState existiert, geben wir die leere Verteilung zurück
+    if (!evaluationState?.sections) {
+      return distribution;
+    }
+
+    Object.entries(sections).forEach(([sectionKey, section]) => {
+      Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
+        if (!criterion.excludeFromTotal) {
+          const score = evaluationState.sections[sectionKey]?.criteria[criterionKey]?.score;
+          distribution[score || 0]++;
+        }
+      });
+    });
+
+    return distribution;
+  };
+
   // Calculate total progress
   const totalProgress = Object.values(validation).reduce(
     (acc, curr) => {
@@ -56,17 +98,24 @@ const EvaluationNavigation = ({
     },
     { completed: 0, total: 0 }
   );
-  
+
   const progressPercentage = Math.round((totalProgress.completed / totalProgress.total) * 100);
+
+  // Nur Analytics Dialog rendern wenn evaluationState existiert
+  const canShowAnalytics = Boolean(evaluationState?.sections);
 
   return (
     <div className="space-y-4">
       {/* Final Grade Card */}
       <Card className="p-4 bg-green-50">
         <div className="text-center">
-          <h3 className="font-medium text-green-800">Final Grade</h3>
-          <div className="text-3xl font-bold text-green-700 mt-1">
-            {finalGrade}
+          <h3 className="font-medium text-green-800">Current Rating</h3>
+          <div className="text-3xl font-bold text-green-700 mt-1 flex justify-center">
+            <StarRating
+              score={parseFloat(finalGrade)}
+              size="lg"
+              showEmpty={true}
+            />
           </div>
         </div>
       </Card>
@@ -77,7 +126,7 @@ const EvaluationNavigation = ({
         <div className="mb-4">
           <h3 className="font-medium mb-2">Overall Progress</h3>
           <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div 
+            <div
               className={cn(
                 "absolute left-0 top-0 h-full transition-all duration-300 rounded-full",
                 progressPercentage === 100 ? "bg-green-500" : "bg-blue-500"
@@ -129,7 +178,7 @@ const EvaluationNavigation = ({
 
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-500">
-                      {sectionValidation.sectionScore > 0 && 
+                      {sectionValidation.sectionScore > 0 &&
                         `${sectionValidation.sectionScore}`
                       }
                     </span>
@@ -144,13 +193,13 @@ const EvaluationNavigation = ({
 
                   {/* Progress bar */}
                   <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-100">
-                    <div 
+                    <div
                       className={cn(
                         "h-full transition-all duration-300",
                         isComplete ? "bg-green-500" : "bg-blue-500"
                       )}
-                      style={{ 
-                        width: `${(sectionValidation.completedCriteria / sectionValidation.totalCriteria) * 100}%` 
+                      style={{
+                        width: `${(sectionValidation.completedCriteria / sectionValidation.totalCriteria) * 100}%`
                       }}
                     />
                   </div>
@@ -161,35 +210,40 @@ const EvaluationNavigation = ({
         </ScrollArea>
       </Card>
 
-      {/* View Complete Text Button */}
-      <Button 
-        className="w-full"
-        variant="outline"
-        onClick={() => setShowFullText(true)}
-      >
-        <FileText className="h-4 w-4 mr-2" />
-        View Complete Text
-      </Button>
+      {/* Action Buttons */}
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => setShowFullText(true)}
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          View Complete Text
+        </Button>
+
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => setShowAnalytics(true)}
+          disabled={!canShowAnalytics}
+        >
+          <BarChart2 className="h-4 w-4 mr-2" />
+          View Analytics
+        </Button>
+      </div>
 
       {/* Complete Text Dialog */}
       <Dialog open={showFullText} onOpenChange={setShowFullText}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle className="flex justify-between items-center">
+            <DialogTitle className="items-center">
               Complete Evaluation Text
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowFullText(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             {Object.entries(sections).map(([sectionKey, section]) => (
               <div key={sectionKey} className="space-y-2">
-                <h4 className="font-medium">{section.title}</h4>
+                <h3>{section.title}</h3>
                 <p className="text-gray-700">
                   {generatedTexts[sectionKey] || "No criteria selected yet."}
                 </p>
@@ -198,6 +252,18 @@ const EvaluationNavigation = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Analytics Dialog nur rendern wenn Daten vorhanden */}
+      {canShowAnalytics && (
+        <AnalyticsDialog
+          isOpen={showAnalytics}
+          onClose={() => setShowAnalytics(false)}
+          sections={sections}
+          sectionScores={evaluationState.sections}
+          scoreDistribution={calculateScoreDistribution()}
+          finalGrade={parseFloat(finalGrade)}
+        />
+      )}
     </div>
   );
 };
