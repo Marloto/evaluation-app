@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Settings, RotateCcw, Download, Upload } from 'lucide-react';
 import { useConfig } from './ConfigProvider';
-import { EvaluationStateProvider, useEvaluationState } from './EvaluationStateProvider';
+import { EvaluationState, EvaluationStateProvider, useEvaluationState } from './EvaluationStateProvider';
 import Criterion from './Criterion';
 import ConfigurationSidebar from './ConfigurationSidebar';
 import EvaluationNavigation from './EvaluationNavigation';
@@ -13,20 +13,24 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PenSquare } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import ResetConfirmDialog from './dialogs/ResetConfirmDialog';
+import { useGrades } from './GradeProvider';
 
 import { format } from 'date-fns';
 import { toast } from "sonner";  // shadcn verwendet sonner für Toasts
+import StarRating from './StarRating';
+import { Criterion as CriterionType, EvaluationConfig, GradeConfig, Option, Section } from '@/types';
 
 // Typ für die gespeicherte Konfiguration
 interface SavedConfiguration {
     version: string;
     timestamp: string;
-    config: any;
-    evaluationState: any;
+    config: EvaluationConfig;
+    evaluationState: EvaluationState;
+    gradeConfig: GradeConfig;  // Neue Eigenschaft
 }
 
 // Helper Funktionen für den Download
-const downloadJson = (data: any, filename: string) => {
+const downloadJson = (data: SavedConfiguration, filename: string) => {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -48,6 +52,7 @@ const EvaluationContent = () => {
         resetAll,
         loadState  // Neue Funktion hinzugefügt
     } = useEvaluationState();
+    const { config: gradeConfig, updateConfig: updateGradeConfig } = useGrades();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [editingPreamble, setEditingPreamble] = useState<string | null>(null);
     const [preambleText, setPreambleText] = useState<string>('');
@@ -61,7 +66,8 @@ const EvaluationContent = () => {
             version: "1.0",
             timestamp: new Date().toISOString(),
             config,
-            evaluationState: state  // Nutze existierenden state
+            evaluationState: state,
+            gradeConfig
         };
 
         const filename = `thesis-evaluation-${format(new Date(), 'yyyy-MM-dd-HH-mm')}.json`;
@@ -77,14 +83,20 @@ const EvaluationContent = () => {
         reader.onload = (e) => {
             try {
                 const content = e.target?.result as string;
-                const savedConfig: SavedConfiguration = JSON.parse(content);
+                const savedConfig = JSON.parse(content) as SavedConfiguration;
 
-                if (!savedConfig.version || !savedConfig.config || !savedConfig.evaluationState) {
+                // Validiere die Struktur der geladenen Konfiguration
+                if (!savedConfig.version || 
+                    !savedConfig.config || 
+                    !savedConfig.evaluationState || 
+                    !savedConfig.gradeConfig) {
                     throw new Error('Invalid configuration file format');
                 }
 
-                updateConfig(savedConfig.config);
+                // Typsichere Updates
+                updateConfig(savedConfig.config as EvaluationConfig);
                 loadState(savedConfig.evaluationState);
+                updateGradeConfig(savedConfig.gradeConfig as GradeConfig);
 
                 toast.success('Configuration loaded successfully');
             } catch (error) {
@@ -93,12 +105,6 @@ const EvaluationContent = () => {
             }
         };
         reader.readAsText(file);
-    };
-
-    // Wird beim Start des Editierens aufgerufen
-    const startEditingPreamble = (sectionKey: string) => {
-        setPreambleText(state.sections[sectionKey]?.preamble || '');
-        setEditingPreamble(sectionKey);
     };
 
     // Wird bei jeder Texteingabe aufgerufen
@@ -159,25 +165,22 @@ const EvaluationContent = () => {
         updateCriterion(sectionKey, criterionKey, update);
     };
 
-    const handlePreambleUpdate = (sectionKey: string, preamble: string) => {
-        updatePreamble(sectionKey, preamble);
-        setEditingPreamble(null);
-    };
-
-    const generateSectionText = (sectionKey: string, section: any) => {
+    const generateSectionText = (sectionKey: string, section: Section) => {
         const sectionState = state.sections[sectionKey];
         const preamble = sectionState?.preamble?.trim();
 
         const selectedTexts = Object.entries(section.criteria)
-            .map(([criterionKey, criterion]: [string, any]) => {
+            .map(([criterionKey, criterion]: [string, CriterionType]) => {
                 const criterionState = sectionState?.criteria[criterionKey];
                 return criterionState?.score !== undefined ?
-                    (criterionState.customText || criterion.options.find((opt: any) => opt.score === criterionState.score)?.text || "") :
+                    (criterionState.customText || criterion.options.find((opt: Option) => opt.score === criterionState.score)?.text || "") :
                     null;
             })
             .filter(text => text !== null);
 
-        const generatedText = selectedTexts.join(". ") + (selectedTexts.length > 0 ? "." : "");
+        const generatedText = selectedTexts
+            .map(text => text.trim().endsWith('.') ? text.trim() : `${text.trim()}.`)
+            .join(' ');
         return preamble ? `${preamble}${generatedText ? ' ' + generatedText : ''}` : generatedText;
     };
 
@@ -213,7 +216,7 @@ const EvaluationContent = () => {
         return totalWeight > 0 ? (totalScore / totalWeight).toFixed(1) : "N/A";
     };
 
-    const renderSection = (sectionKey: string, section: any) => (
+    const renderSection = (sectionKey: string, section: Section) => (
         <div key={sectionKey} className="border-t p-4">
             <div className="flex justify-between items-center mb-4">
                 <div className="space-y-1">
@@ -221,7 +224,12 @@ const EvaluationContent = () => {
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                         <span>Progress: {sectionValidation[sectionKey].completedCriteria}/{sectionValidation[sectionKey].totalCriteria}</span>
                         <span>|</span>
-                        <span>Section Score: {sectionValidation[sectionKey].sectionScore}</span>
+                        {/* <span>Section Score: {sectionValidation[sectionKey].sectionScore}</span> */}
+                        <span><StarRating
+                        score={sectionValidation[sectionKey].sectionScore}
+                        size="sm"
+                        showEmpty={true}
+                        /></span>
                     </div>
                 </div>
                 <Button
@@ -263,7 +271,7 @@ const EvaluationContent = () => {
                 </div>
             )}
 
-            {Object.entries(section.criteria).map(([criterionKey, criterion]: [string, any]) => (
+            {Object.entries(section.criteria).map(([criterionKey, criterion]: [string, CriterionType]) => (
                 <Criterion
                     key={criterionKey}
                     title={criterion.title}
@@ -304,36 +312,28 @@ const EvaluationContent = () => {
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle>Select Criterions</CardTitle>
                                 <div className="flex items-center space-x-2">
-                                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleUpload}
-                  accept=".json"
-                  className="hidden"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Import
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownload}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleUpload}
+                                        accept=".json"
+                                        className="hidden"
+                                    />
                                     <Button
-                                        variant="destructive"
+                                        variant="outline"
                                         size="sm"
-                                        onClick={() => setIsResetDialogOpen(true)}
+                                        onClick={() => fileInputRef.current?.click()}
                                     >
-                                        <RotateCcw className="h-4 w-4 mr-2" />
-                                        Reset
+                                        <Upload className="h-4 w-4 mr-2" />
+                                        Import
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleDownload}
+                                    >
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Export
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -342,6 +342,14 @@ const EvaluationContent = () => {
                                     >
                                         <Settings className="h-4 w-4 mr-2" />
                                         Settings
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => setIsResetDialogOpen(true)}
+                                    >
+                                        <RotateCcw className="h-4 w-4 mr-2" />
+                                        Reset
                                     </Button>
                                 </div>
                             </CardHeader>

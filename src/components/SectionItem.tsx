@@ -176,6 +176,7 @@ export const SectionList: React.FC<SectionListProps> = ({
         <div className="space-y-4">
             <Button
                 onClick={handleAdd}
+                variant="outline"
                 className="w-full"
             >
                 <Plus className="h-4 w-4 mr-2" />

@@ -7,7 +7,7 @@ import { evaluationConfig as defaultConfig } from '@/config/evaluation-config';
 interface ConfigContextType {
   config: EvaluationConfig;
   updateConfig: (newConfig: EvaluationConfig) => void;
-  resetToDefault: () => void;
+  resetToDefault: () => void;  // Neue Funktion
 }
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);

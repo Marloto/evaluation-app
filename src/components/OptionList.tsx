@@ -20,16 +20,15 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Option } from '@/types';
+import StarRating from './StarRating';
 
 interface SortableOptionProps {
     option: Option;
-    index: number;
     onEdit: () => void;
 }
 
 const SortableOption: React.FC<SortableOptionProps> = ({
     option,
-    index,
     onEdit
 }) => {
     const {
@@ -60,7 +59,15 @@ const SortableOption: React.FC<SortableOptionProps> = ({
             </button>
             <div className="flex-1">
                 <div className="font-medium">{option.text}</div>
-                <div className="text-sm text-gray-500">Score: {option.score}</div>
+                <div className="text-sm text-gray-500 flex items-center gap-1">
+                    Score:
+                    <StarRating
+                        score={option.score}
+                        size="sm"
+                        showEmpty={true}
+                    />
+                    ({option.score})
+                </div>
             </div>
             <Button
                 variant="ghost"
@@ -144,7 +151,7 @@ export const OptionList: React.FC<OptionListProps> = ({
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
-        
+
         if (over && active.id !== over.id) {
             const oldIndex = options.findIndex(
                 item => `${item.score}-${item.text}` === active.id
@@ -162,7 +169,7 @@ export const OptionList: React.FC<OptionListProps> = ({
 
     return (
         <div className="p-2 pt-0">
-            <Button onClick={handleAdd} className="w-full mb-2">
+            <Button onClick={handleAdd} variant="outline" className="w-full mb-2">
                 <Plus className="h-4 w-4" />
                 Add Option
             </Button>
@@ -181,7 +188,6 @@ export const OptionList: React.FC<OptionListProps> = ({
                             <SortableOption
                                 key={`${option.score}-${option.text}`}
                                 option={option}
-                                index={index}
                                 onEdit={() => handleEdit(index)}
                             />
                         ))}

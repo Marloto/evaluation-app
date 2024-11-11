@@ -10,8 +10,7 @@ import {
   AlertCircle,
   Loader2,
   FileText,
-  BarChart2,
-  X
+  BarChart2
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import {
@@ -65,29 +64,6 @@ const EvaluationNavigation = ({
 }: NavigationProps) => {
   const [showFullText, setShowFullText] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-
-  // Calculate score distribution
-  const calculateScoreDistribution = () => {
-    const distribution: { [key: number]: number } = {
-      0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0
-    };
-
-    // Wenn kein evaluationState existiert, geben wir die leere Verteilung zurück
-    if (!evaluationState?.sections) {
-      return distribution;
-    }
-
-    Object.entries(sections).forEach(([sectionKey, section]) => {
-      Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
-        if (!criterion.excludeFromTotal) {
-          const score = evaluationState.sections[sectionKey]?.criteria[criterionKey]?.score;
-          distribution[score || 0]++;
-        }
-      });
-    });
-
-    return distribution;
-  };
 
   // Calculate total progress
   const totalProgress = Object.values(validation).reduce(
@@ -234,7 +210,7 @@ const EvaluationNavigation = ({
 
       {/* Complete Text Dialog */}
       <Dialog open={showFullText} onOpenChange={setShowFullText}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto" onOpenAutoFocus={(e) => { e.preventDefault(); }}>
           <DialogHeader>
             <DialogTitle className="items-center">
               Complete Evaluation Text
@@ -260,8 +236,6 @@ const EvaluationNavigation = ({
           onClose={() => setShowAnalytics(false)}
           sections={sections}
           sectionScores={evaluationState.sections}
-          scoreDistribution={calculateScoreDistribution()}
-          finalGrade={parseFloat(finalGrade)}
         />
       )}
     </div>

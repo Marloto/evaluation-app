@@ -86,7 +86,7 @@ const Criterion = ({
             {/* Selected Option Preview */}
             {hasValue && !isEditing && (
               <div className="relative group">
-                <div className="p-3 bg-gray-50 rounded-md min-h-[60px]">
+                <div className="p-3 pe-10 bg-gray-50 rounded-md min-h-[60px]">
                   {customText || selectedOption?.text}
                 </div>
                 <Button

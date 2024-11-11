@@ -37,7 +37,7 @@ export const evaluationConfig: EvaluationConfig = {
               { text: "Die praktische Implementierung erfüllt die grundlegenden Anforderungen, zeigt aber Optimierungspotential in Architektur und Code-Qualität", score: 2 },
               { text: "Die praktische Implementierung ist solide umgesetzt mit angemessener Architektur und guter Code-Qualität", score: 3 },
               { text: "Die praktische Implementierung überzeugt durch durchdachte Architektur, sehr gute Code-Qualität und effiziente Problemlösung", score: 4 },
-              { text: "Die praktische Implementierung ist hervorragend umgesetzt mit innovativer Architektur, exzellenter Code-Qualität und zeigt tiefes technisches Verständnis", score: 5 }
+              { text: "Die praktische Implementierung ist sehr gut strukturiert mit durchdachter Architektur, sauberem, wartbarem Code und zeigt fundiertes technisches Verständnis", score: 5 }
             ]
           }
         }
@@ -129,15 +129,37 @@ export const evaluationConfig: EvaluationConfig = {
         title: "Gliederung",
         weight: 0.2,
         criteria: {
-          logic: {
-            title: "Logischer Aufbau",
-            weight: 0.5,
+          structure_logic: {
+            title: "Struktureller Aufbau",
+            weight: 0.4,
             options: [
-              { text: "Die Gliederung der Arbeit ist unübersichtlich, Kapitel unausgewogen und ohne erkennbare Struktur", score: 1 },
-              { text: "Die Gliederung der Arbeit zeigt grundlegende Strukturen, Kapitel sind aber ungleichmäßig ausgearbeitet", score: 2 },
-              { text: "Die Gliederung der Arbeit ist nachvollziehbar, Kapitel angemessen strukturiert", score: 3 },
-              { text: "Die Gliederung der Arbeit ist klar und durchdacht, Kapitel gut strukturiert und ausgewogen", score: 4 },
-              { text: "Die Gliederung folgt einem logischen und nachvollziehbaren Vorgehen, Kapitel sehr gut strukturiert und optimal aufeinander aufbauend", score: 5 }
+              { text: "Die Gliederung ist unübersichtlich und folgt keiner erkennbaren Logik. Zentrale Aspekte der Arbeit spiegeln sich nicht in der Struktur wider", score: 1 },
+              { text: "Die Gliederung zeigt eine grundlegende Struktur, aber mit schwacher logischer Verknüpfung der Kapitel. Der rote Faden ist nur teilweise erkennbar", score: 2 },
+              { text: "Die Gliederung ist nachvollziehbar aufgebaut mit erkennbarer Progression von Grundlagen über Hauptteil zur Auswertung. Die Kapitel bauen logisch aufeinander auf", score: 3 },
+              { text: "Die Gliederung ist gut durchdacht mit klarer thematischer Entwicklung. Die Kapitel sind sinnvoll verknüpft und führen zielgerichtet durch die Arbeit", score: 4 },
+              { text: "Die Gliederung zeigt eine sehr schlüssige Struktur und durchgängige thematische Entwicklung. Die Kapitel sind gut verzahnt und bilden einen klaren Argumentationsfluss von der Einleitung bis zum Fazit", score: 5 }
+            ]
+          },
+          depth_balance: {
+            title: "Gliederungstiefe und Gewichtung",
+            weight: 0.3,
+            options: [
+              { text: "Die Gliederungstiefe ist stark unausgewogen. Wichtige Bereiche sind zu oberflächlich, während nebensächliche Aspekte übermäßig untergliedert sind", score: 1 },
+              { text: "Die Gliederungstiefe zeigt Ungleichgewichte. Die Gewichtung der Kapitel entspricht nicht durchgängig ihrer inhaltlichen Bedeutung", score: 2 },
+              { text: "Die Gliederungstiefe ist angemessen mit weitgehend ausgewogener Behandlung der verschiedenen Themenbereiche", score: 3 },
+              { text: "Die Gliederungstiefe ist gut gewählt mit klarem Fokus auf den relevanten Aspekten. Die Gewichtung der Kapitel spiegelt ihre Bedeutung wider", score: 4 },
+              { text: "Die Gliederungstiefe ist durchgängig angemessen mit sehr guter Balance zwischen allen Arbeitsteilen. Die Untergliederung folgt konsequent der inhaltlichen Relevanz", score: 5 }
+            ]
+          },
+          formal_quality: {
+            title: "Formale Qualität",
+            weight: 0.3,
+            options: [
+              { text: "Die formale Umsetzung weist erhebliche Mängel auf. Nummerierung inkonsistent, Überschriften unpräzise, Gliederungsebenen unklar", score: 1 },
+              { text: "Die formale Umsetzung zeigt mehrere Schwächen. Teilweise inkonsistente Formulierungen oder unklare Hierarchien in den Gliederungsebenen", score: 2 },
+              { text: "Die formale Umsetzung ist solide. Durchgängig korrekte Nummerierung, nachvollziehbare Überschriften und klare Gliederungsebenen", score: 3 },
+              { text: "Die formale Umsetzung ist sehr gut. Präzise Kapitelbezeichnungen, konsistente Formatierung und gut abgestimmte Gliederungsebenen", score: 4 },
+              { text: "Die formale Umsetzung ist durchgängig sorgfältig. Überschriften sind präzise und aussagekräftig, die Formatierung einheitlich und die Gliederungsebenen gut differenziert", score: 5 }
             ]
           }
         }

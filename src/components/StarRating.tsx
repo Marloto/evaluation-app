@@ -35,7 +35,7 @@ const StarRating = ({
         <Star 
           key={`star-${i}`}
           size={sizeMap[size].star}
-          className="fill-yellow-400 text-yellow-400"
+          className="fill-green-700 text-green-700"
         />
       );
     }
@@ -46,7 +46,7 @@ const StarRating = ({
         <StarHalf
           key="star-half"
           size={sizeMap[size].star}
-          className="fill-yellow-400 text-yellow-400"
+          className="fill-green-700 text-green-700"
         />
       );
     } else if (decimal >= 0.75) {
@@ -54,7 +54,7 @@ const StarRating = ({
         <Star
           key="star-rounded"
           size={sizeMap[size].star}
-          className="fill-yellow-400 text-yellow-400"
+          className="fill-green-700 text-green-700"
         />
       );
     }

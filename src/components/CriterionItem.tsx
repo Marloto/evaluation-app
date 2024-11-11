@@ -5,7 +5,7 @@ import { useConfigurationManager } from './ConfigurationManager';
 import { CriterionEditDialog } from './dialogs/CriterionEditDialog';
 import DeleteConfirmDialog from './dialogs/DeleteConfirmDialog';
 import OptionList from './OptionList';
-import { Criterion, Option } from '@/types';
+import { Criterion } from '@/types';
 
 interface CriterionItemProps {
     sectionKey: string;
@@ -177,6 +177,7 @@ export const CriterionList: React.FC<CriterionListProps> = ({
             <Button
                 onClick={handleAdd}
                 size="sm"
+                variant="outline"
                 className="w-full mb-2"
             >
                 <Plus className="h-4 w-4 mr-2" />
