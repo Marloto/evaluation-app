@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useCallback } from 'react';
 import { Option } from '@/types';
-import { useConfig } from './ConfigProvider';
+import { useConfig } from './providers/ConfigProvider';
 
 interface ConfigurationContextValue {
   addSection: (title: string, weight: number) => void;

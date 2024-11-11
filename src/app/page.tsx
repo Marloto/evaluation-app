@@ -1,6 +1,6 @@
 // app/page.tsx
 import { MainSplitView } from '../components/MainSplitView'
-import { ConfigProvider } from '../components/ConfigProvider'
+import { ConfigProvider } from '../components/providers/ConfigProvider'
 import { ConfigurationManager } from '../components/ConfigurationManager'
 import { GradeProvider } from '../components/GradeProvider'
 

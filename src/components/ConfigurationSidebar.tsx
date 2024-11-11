@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Settings2, RotateCcw } from "lucide-react";
-import { useConfig } from './ConfigProvider';
+import { useConfig } from './providers/ConfigProvider';
 import { useGrades } from './GradeProvider';
 import { cn } from "@/lib/utils";
 import { SectionList } from './SectionItem';
