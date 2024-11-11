@@ -26,7 +26,7 @@ export const evaluationConfig: EvaluationConfig = {
               { text: "Lösungsstrategien wurden teilweise eigenständig erarbeitet, benötigten aber häufige Anpassungen", score: 2 },
               { text: "Lösungsstrategien wurden meist eigenständig erarbeitet", score: 3 },
               { text: "Lösungsstrategien wurden eigenständig erarbeitet und gut umgesetzt", score: 4 },
-              { text: "Lösungsstrategien und Ansätze wurden eigenständig erarbeitet, angewendet sowie umfangreich präsentiert", score: 5 }
+              { text: "Lösungsstrategien und Ansätze wurden durchweg eigenständig erarbeitet, angewendet sowie klar nachvollziehbar präsentiert", score: 5 }
             ]
           },
           implementation: {
@@ -92,7 +92,7 @@ export const evaluationConfig: EvaluationConfig = {
           },
           source_usage: {
             title: "Quellenarbeit",
-            weight: 0.15,
+            weight: 0.1,
             options: [
               { text: "Quellen werden kaum verwendet, die Zitierung ist fehlerhaft", score: 1 },
               { text: "Quellen werden verwendet, die Zitierung weist häufig Mängel auf", score: 2 },
