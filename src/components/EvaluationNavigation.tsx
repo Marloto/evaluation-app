@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useMemo, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,21 +21,10 @@ import { Section } from '@/lib/types/types';
 import AnalyticsDialog from './dialogs/AnalyticsDialog';
 import StarRating from './StarRating';
 import { calculateSectionScore, calculateTotalScore } from '@/lib/utils/calculation';
+import { generateFullText } from '@/lib/utils/text-generation';
 
 interface NavigationProps {
-  sections: { [key: string]: Section };
-  validation: {
-    [key: string]: {
-      complete: boolean;
-      totalCriteria: number;
-      completedCriteria: number;
-      sectionScore: number;
-    };
-  };
-  activeSection: string | null;
-  onSectionSelect: (sectionKey: string) => void;
-  finalGrade: string;
-  generatedTexts: { [key: string]: string };
+  sections: Record<string, Section>;
   evaluationState: {
     sections: {
       [key: string]: {
@@ -52,26 +39,30 @@ interface NavigationProps {
     };
     activeSection: string | null;
   };
+  activeSection: string | null;
+  onSectionSelect: (sectionKey: string) => void;
 }
 
-const EvaluationNavigation = ({
+const EvaluationNavigation: React.FC<NavigationProps> = ({
   sections,
-  validation,
+  evaluationState,
   activeSection,
   onSectionSelect,
-  finalGrade,
-  generatedTexts,
-  evaluationState
-}: NavigationProps) => {
+}) => {
   const [showFullText, setShowFullText] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
 
-  // Calculate total progress
-  const { score, percentage, validCriteria, totalCriteria } = calculateTotalScore(sections, evaluationState);
-  const progressPercentage = percentage;
+  // Calculate total score
+  const { score, percentage, validCriteria, totalCriteria } = useMemo(() =>
+    calculateTotalScore(sections, evaluationState),
+    [sections, evaluationState]
+  );
 
-  // Nur Analytics Dialog rendern wenn evaluationState existiert
-  const canShowAnalytics = Boolean(evaluationState?.sections);
+  // Generate texts when needed (only when dialog is open)
+  const generatedTexts = useMemo(() =>
+    showFullText ? generateFullText(sections, evaluationState) : {},
+    [sections, evaluationState, showFullText]
+  );
 
   return (
     <div className="space-y-4">
@@ -98,13 +89,13 @@ const EvaluationNavigation = ({
             <div
               className={cn(
                 "absolute left-0 top-0 h-full transition-all duration-300 rounded-full",
-                progressPercentage === 100 ? "bg-green-500" : "bg-blue-500"
+                percentage === 100 ? "bg-green-500" : "bg-blue-500"
               )}
-              style={{ width: `${progressPercentage}%` }}
+              style={{ width: `${percentage}%` }}
             />
           </div>
           <div className="mt-1 text-sm text-gray-500 flex justify-between">
-            <span>{progressPercentage}% Complete</span>
+            <span>{percentage}% Complete</span>
             <span>{validCriteria}/{totalCriteria} Criteria</span>
           </div>
         </div>
@@ -113,8 +104,9 @@ const EvaluationNavigation = ({
         <ScrollArea className="h-[calc(100vh-400px)]">
           <div className="space-y-2">
             {Object.entries(sections).map(([sectionKey, section]) => {
-              const { score, validCriteria, totalCriteria } = calculateSectionScore(section, evaluationState.sections[sectionKey]);
-              const isComplete = validCriteria == totalCriteria;
+              const { score: sectionScore, validCriteria: sectionValidCriteria, totalCriteria: sectionTotalCriteria } =
+                calculateSectionScore(section, evaluationState.sections[sectionKey]);
+              const isComplete = sectionValidCriteria === sectionTotalCriteria;
               const isActive = activeSection === sectionKey;
 
               return (
@@ -131,7 +123,7 @@ const EvaluationNavigation = ({
                   <div className="flex items-center gap-2">
                     {isComplete ? (
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    ) : totalCriteria > 0 ? (
+                    ) : sectionTotalCriteria > 0 ? (
                       <Loader2 className="h-4 w-4 text-blue-500" />
                     ) : (
                       <AlertCircle className="h-4 w-4 text-gray-400" />
@@ -152,7 +144,7 @@ const EvaluationNavigation = ({
                       }
                     </span>
                     <span className="text-xs text-gray-400">
-                      {validCriteria}/{totalCriteria}
+                      {sectionValidCriteria}/{sectionTotalCriteria}
                     </span>
                     <ChevronRight className={cn(
                       "h-4 w-4 transition-transform",
@@ -168,7 +160,7 @@ const EvaluationNavigation = ({
                         isComplete ? "bg-green-500" : "bg-blue-500"
                       )}
                       style={{
-                        width: `${(validCriteria / totalCriteria) * 100}%`
+                        width: `${(sectionValidCriteria / sectionTotalCriteria) * 100}%`
                       }}
                     />
                   </div>
@@ -194,7 +186,6 @@ const EvaluationNavigation = ({
           className="w-full"
           variant="outline"
           onClick={() => setShowAnalytics(true)}
-          disabled={!canShowAnalytics}
         >
           <BarChart2 className="h-4 w-4 mr-2" />
           View Analytics
@@ -203,11 +194,9 @@ const EvaluationNavigation = ({
 
       {/* Complete Text Dialog */}
       <Dialog open={showFullText} onOpenChange={setShowFullText}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto" onOpenAutoFocus={(e) => { e.preventDefault(); }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
           <DialogHeader>
-            <DialogTitle className="items-center">
-              Complete Evaluation Text
-            </DialogTitle>
+            <DialogTitle>Complete Evaluation Text</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             {Object.entries(sections).map(([sectionKey, section]) => (
@@ -222,15 +211,13 @@ const EvaluationNavigation = ({
         </DialogContent>
       </Dialog>
 
-      {/* Analytics Dialog nur rendern wenn Daten vorhanden */}
-      {canShowAnalytics && (
-        <AnalyticsDialog
-          isOpen={showAnalytics}
-          onClose={() => setShowAnalytics(false)}
-          sections={sections}
-          sectionScores={evaluationState.sections}
-        />
-      )}
+      {/* Analytics Dialog */}
+      <AnalyticsDialog
+        isOpen={showAnalytics}
+        onClose={() => setShowAnalytics(false)}
+        sections={sections}
+        sectionScores={evaluationState.sections}
+      />
     </div>
   );
 };
