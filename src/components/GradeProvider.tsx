@@ -1,8 +1,8 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { GradeConfig, GradeThreshold } from '@/types';
-import { defaultGradeConfig } from '../config/grade-config';
+import { GradeConfig, GradeThreshold } from '@/lib/types/types';
+import { defaultGradeConfig } from '../lib/config/grade-config';
 
 interface GradeContextType {
     config: GradeConfig;

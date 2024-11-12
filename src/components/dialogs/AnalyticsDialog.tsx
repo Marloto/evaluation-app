@@ -14,7 +14,7 @@ import {
     Tooltip,
     Legend
 } from 'recharts';
-import { Section } from '@/types';
+import { Section } from '@/lib/types/types';
 import StarRating from '../StarRating';
 import { useGrades } from '../GradeProvider';
 

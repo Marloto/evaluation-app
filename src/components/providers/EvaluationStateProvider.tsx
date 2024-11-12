@@ -1,7 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Section } from '@/types';
+import { Section } from '@/lib/types/types';
 
 // Types für die Bewertungsdaten
 interface CriterionState {

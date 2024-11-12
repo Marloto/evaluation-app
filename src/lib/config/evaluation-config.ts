@@ -1,5 +1,5 @@
 // config/evaluation-config.ts
-import { EvaluationConfig } from '../types';
+import { EvaluationConfig } from '../types/types';
 
 export const evaluationConfig: EvaluationConfig = {
     sections: {

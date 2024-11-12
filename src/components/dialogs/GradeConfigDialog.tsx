@@ -17,7 +17,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Plus, Trash2 } from "lucide-react";
-import { GradeThreshold } from '@/types';
+import { GradeThreshold } from '@/lib/types/types';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface GradeConfigDialogProps {

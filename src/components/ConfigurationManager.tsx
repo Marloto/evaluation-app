@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useCallback } from 'react';
-import { Option } from '@/types';
+import { Option } from '@/lib/types/types';
 import { useConfig } from './providers/ConfigProvider';
 
 interface ConfigurationContextValue {

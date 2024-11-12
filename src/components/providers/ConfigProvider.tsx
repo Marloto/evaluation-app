@@ -1,8 +1,8 @@
 "use client"
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { EvaluationConfig } from '@/types';
-import { evaluationConfig as defaultConfig } from '@/config/evaluation-config';
+import { EvaluationConfig } from '@/lib/types/types';
+import { evaluationConfig as defaultConfig } from '@/lib/config/evaluation-config';
 
 interface ConfigContextType {
   config: EvaluationConfig;

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,16 +12,17 @@ import {
   FileText,
   BarChart2
 } from 'lucide-react';
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/misc";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Section } from '@/types';
+import { Section } from '@/lib/types/types';
 import AnalyticsDialog from './dialogs/AnalyticsDialog';
 import StarRating from './StarRating';
+import { calculateSectionScore, calculateTotalScore } from '@/lib/utils/calculation';
 
 interface NavigationProps {
   sections: { [key: string]: Section };
@@ -66,16 +67,8 @@ const EvaluationNavigation = ({
   const [showAnalytics, setShowAnalytics] = useState(false);
 
   // Calculate total progress
-  const totalProgress = Object.values(validation).reduce(
-    (acc, curr) => {
-      acc.completed += curr.completedCriteria;
-      acc.total += curr.totalCriteria;
-      return acc;
-    },
-    { completed: 0, total: 0 }
-  );
-
-  const progressPercentage = Math.round((totalProgress.completed / totalProgress.total) * 100);
+  const { score, percentage, validCriteria, totalCriteria } = calculateTotalScore(sections, evaluationState);
+  const progressPercentage = percentage;
 
   // Nur Analytics Dialog rendern wenn evaluationState existiert
   const canShowAnalytics = Boolean(evaluationState?.sections);
@@ -88,7 +81,7 @@ const EvaluationNavigation = ({
           <h3 className="font-medium text-green-800">Current Rating</h3>
           <div className="text-3xl font-bold text-green-700 mt-1 flex justify-center">
             <StarRating
-              score={parseFloat(finalGrade)}
+              score={score}
               size="lg"
               showEmpty={true}
             />
@@ -112,7 +105,7 @@ const EvaluationNavigation = ({
           </div>
           <div className="mt-1 text-sm text-gray-500 flex justify-between">
             <span>{progressPercentage}% Complete</span>
-            <span>{totalProgress.completed}/{totalProgress.total} Criteria</span>
+            <span>{validCriteria}/{totalCriteria} Criteria</span>
           </div>
         </div>
 
@@ -120,8 +113,8 @@ const EvaluationNavigation = ({
         <ScrollArea className="h-[calc(100vh-400px)]">
           <div className="space-y-2">
             {Object.entries(sections).map(([sectionKey, section]) => {
-              const sectionValidation = validation[sectionKey];
-              const isComplete = sectionValidation.complete;
+              const { score, validCriteria, totalCriteria } = calculateSectionScore(section, evaluationState.sections[sectionKey]);
+              const isComplete = validCriteria == totalCriteria;
               const isActive = activeSection === sectionKey;
 
               return (
@@ -138,7 +131,7 @@ const EvaluationNavigation = ({
                   <div className="flex items-center gap-2">
                     {isComplete ? (
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    ) : sectionValidation.completedCriteria > 0 ? (
+                    ) : totalCriteria > 0 ? (
                       <Loader2 className="h-4 w-4 text-blue-500" />
                     ) : (
                       <AlertCircle className="h-4 w-4 text-gray-400" />
@@ -154,12 +147,12 @@ const EvaluationNavigation = ({
 
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-500">
-                      {sectionValidation.sectionScore > 0 &&
-                        `${sectionValidation.sectionScore}`
+                      {score > 0 &&
+                        `${score}`
                       }
                     </span>
                     <span className="text-xs text-gray-400">
-                      {sectionValidation.completedCriteria}/{sectionValidation.totalCriteria}
+                      {validCriteria}/{totalCriteria}
                     </span>
                     <ChevronRight className={cn(
                       "h-4 w-4 transition-transform",
@@ -175,7 +168,7 @@ const EvaluationNavigation = ({
                         isComplete ? "bg-green-500" : "bg-blue-500"
                       )}
                       style={{
-                        width: `${(sectionValidation.completedCriteria / sectionValidation.totalCriteria) * 100}%`
+                        width: `${(validCriteria / totalCriteria) * 100}%`
                       }}
                     />
                   </div>

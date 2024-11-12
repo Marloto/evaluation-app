@@ -14,11 +14,12 @@ import { PenSquare } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import ResetConfirmDialog from './dialogs/ResetConfirmDialog';
 import { useGrades } from './GradeProvider';
+import { calculateTotalScore } from '@/lib/utils/calculation';
 
 import { format } from 'date-fns';
 import { toast } from "sonner";  // shadcn verwendet sonner für Toasts
 import StarRating from './StarRating';
-import { Criterion as CriterionType, EvaluationConfig, GradeConfig, Option, Section } from '@/types';
+import { Criterion as CriterionType, EvaluationConfig, GradeConfig, Option, Section } from '@/lib/types/types';
 
 // Typ für die gespeicherte Konfiguration
 interface SavedConfiguration {
@@ -194,26 +195,8 @@ const EvaluationContent = () => {
     }, [state.sections, config]);
 
     const calculateGrade = () => {
-        let totalScore = 0;
-        let totalWeight = 0;
-
-        Object.entries(config.sections).forEach(([sectionKey, section]) => {
-            const sectionState = state.sections[sectionKey];
-
-            Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
-                // Skip criteria marked with excludeFromTotal
-                if (criterion.excludeFromTotal) {
-                    return;
-                }
-
-                // Use 0 as default score for unselected criteria
-                const score = sectionState?.criteria[criterionKey]?.score ?? 0;
-                totalScore += score * criterion.weight * section.weight;
-                totalWeight += criterion.weight * section.weight;
-            });
-        });
-
-        return totalWeight > 0 ? (totalScore / totalWeight).toFixed(1) : "N/A";
+        const { score } = calculateTotalScore(config.sections, state);
+        return score.toString();
     };
 
     const renderSection = (sectionKey: string, section: Section) => (

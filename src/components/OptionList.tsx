@@ -19,7 +19,7 @@ import {
     useSortable,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Option } from '@/types';
+import { Option } from '@/lib/types/types';
 import StarRating from './StarRating';
 
 interface SortableOptionProps {

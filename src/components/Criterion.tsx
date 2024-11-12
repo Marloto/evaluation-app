@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { ChevronDown, ChevronRight, PenSquare, RotateCcw, Check } from 'lucide-react'
-import { Option } from '@/types'
+import { Option } from '@/lib/types/types'
 import StarRating from './StarRating';
 
 interface CriterionProps {

@@ -4,10 +4,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Settings2, RotateCcw } from "lucide-react";
 import { useConfig } from './providers/ConfigProvider';
 import { useGrades } from './GradeProvider';
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/misc";
 import { SectionList } from './SectionItem';
 import GradeConfigDialog from './dialogs/GradeConfigDialog';
-import { GradeThreshold } from '@/types';
+import { GradeThreshold } from '@/lib/types/types';
 import DeleteConfirmDialog from './dialogs/DeleteConfirmDialog';
 
 interface ConfigurationSidebarProps {

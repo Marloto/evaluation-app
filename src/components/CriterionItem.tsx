@@ -5,7 +5,7 @@ import { useConfigurationManager } from './ConfigurationManager';
 import { CriterionEditDialog } from './dialogs/CriterionEditDialog';
 import DeleteConfirmDialog from './dialogs/DeleteConfirmDialog';
 import OptionList from './OptionList';
-import { Criterion } from '@/types';
+import { Criterion } from '@/lib/types/types';
 
 interface CriterionItemProps {
     sectionKey: string;

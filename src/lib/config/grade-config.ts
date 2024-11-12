@@ -1,4 +1,4 @@
-import { GradeConfig } from "@/types";
+import { GradeConfig } from "@/lib/types/types";
 
 export const defaultGradeConfig: GradeConfig = {
     thresholds: [
