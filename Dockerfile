@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+ARG BASE_PATH=/thesis-evaluation 
+
 # Copy source and build
 COPY . .
 RUN npm run build

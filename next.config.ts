@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: '/thesis-evaluation'
+  basePath: process.env.BASE_PATH || ''
 };
 
 export default nextConfig;
