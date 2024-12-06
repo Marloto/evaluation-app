@@ -1,4 +1,3 @@
-// config/evaluation-templates.ts
 import { EvaluationConfig } from '../types/types';
 import { evaluationConfig } from './evaluation-config';
 
@@ -13,11 +12,11 @@ export const bachelorConfig: EvaluationConfig = {
                 implementation: {
                     ...evaluationConfig.sections.preface.criteria.implementation,
                     options: [
-                        { text: "Die technische Umsetzung weist grundlegende Mängel auf und erfüllt die Anforderungen nur unzureichend", score: 1 },
-                        { text: "Die technische Umsetzung erfüllt die grundlegenden Anforderungen, zeigt aber Optimierungspotential", score: 2 },
-                        { text: "Die technische Umsetzung ist solide und demonstriert praktische Problemlösungskompetenz", score: 3 },
-                        { text: "Die technische Umsetzung überzeugt durch einen durchdachten Ansatz und effiziente Problemlösung", score: 4 },
-                        { text: "Die technische Umsetzung ist sehr gut strukturiert und demonstriert umfassende praktische Problemlösungskompetenz", score: 5 }
+                        { text: "Die technische Umsetzung weist grundlegende Mängel auf", score: 1 },
+                        { text: "Die technische Umsetzung erfüllt grundlegende Anforderungen", score: 2 },
+                        { text: "Die technische Umsetzung ist angemessen und zeigt praktische Problemlösungskompetenz", score: 3 },
+                        { text: "Die technische Umsetzung ist gut durchdacht und zeigt gute Problemlösungskompetenz", score: 4 },
+                        { text: "Die technische Umsetzung ist sehr gut strukturiert und zeigt sehr gute Problemlösungskompetenz", score: 5 }
                     ]
                 }
             }
@@ -26,24 +25,24 @@ export const bachelorConfig: EvaluationConfig = {
             ...evaluationConfig.sections.form,
             criteria: {
                 ...evaluationConfig.sections.form.criteria,
-                approach: {
-                    ...evaluationConfig.sections.form.criteria.approach,
+                scientific_approach: {
+                    ...evaluationConfig.sections.form.criteria.scientific_approach,
                     options: [
-                        { text: "Die Bearbeitung folgt keinem erkennbaren systematischen Vorgehen", score: 1 },
-                        { text: "Die Bearbeitung zeigt Ansätze eines systematischen Vorgehens", score: 2 },
-                        { text: "Die Bearbeitung folgt einem nachvollziehbaren systematischen Vorgehen", score: 3 },
-                        { text: "Die Bearbeitung demonstriert ein gut strukturiertes systematisches Vorgehen", score: 4 },
-                        { text: "Die Bearbeitung zeigt ein sehr gut strukturiertes und zielgerichtetes Vorgehen", score: 5 }
+                        { text: "Das systematische Vorgehen ist nicht erkennbar", score: 1 },
+                        { text: "Das systematische Vorgehen ist teilweise erkennbar", score: 2 },
+                        { text: "Das systematische Vorgehen ist nachvollziehbar", score: 3 },
+                        { text: "Das systematische Vorgehen ist gut strukturiert", score: 4 },
+                        { text: "Das systematische Vorgehen ist sehr gut strukturiert", score: 5 }
                     ]
                 },
-                source_usage: {
-                    ...evaluationConfig.sections.form.criteria.source_usage,
+                citation: {
+                    ...evaluationConfig.sections.form.criteria.citation,
                     options: [
                         { text: "Quellen werden kaum verwendet, die Zitierung ist fehlerhaft", score: 1 },
-                        { text: "Grundlegende Quellen werden verwendet, die Zitierung zeigt noch Mängel", score: 2 },
-                        { text: "Relevante Quellen werden korrekt verwendet und zitiert", score: 3 },
-                        { text: "Verschiedene Quellen werden gut eingebunden und sauber zitiert", score: 4 },
-                        { text: "Die Quellenauswahl ist umfassend und zielführend, die Zitierung durchgehend korrekt", score: 5 }
+                        { text: "Grundlegende Quellen werden verwendet, die Zitierung weist Mängel auf", score: 2 },
+                        { text: "Relevante Quellen werden angemessen verwendet und zitiert", score: 3 },
+                        { text: "Verschiedene Quellen werden gut verwendet und korrekt zitiert", score: 4 },
+                        { text: "Die Quellenauswahl ist umfassend und die Zitierung korrekt", score: 5 }
                     ]
                 }
             }
@@ -62,11 +61,11 @@ export const masterConfig: EvaluationConfig = {
                 implementation: {
                     ...evaluationConfig.sections.preface.criteria.implementation,
                     options: [
-                        { text: "Die methodische Umsetzung weist grundlegende Mängel auf und validiert die Forschungsfrage nicht", score: 1 },
-                        { text: "Die methodische Umsetzung erfüllt grundlegende Anforderungen, die Validation ist oberflächlich", score: 2 },
-                        { text: "Die methodische Umsetzung ist solide und validiert die Forschungsfrage angemessen", score: 3 },
-                        { text: "Die methodische Umsetzung überzeugt durch fundierte Validation der Forschungsfrage", score: 4 },
-                        { text: "Die methodische Umsetzung ist sehr gut strukturiert und validiert die Forschungsfrage umfassend", score: 5 }
+                        { text: "Die methodische Umsetzung validiert die Forschungsfrage nicht", score: 1 },
+                        { text: "Die methodische Umsetzung validiert die Forschungsfrage nur teilweise", score: 2 },
+                        { text: "Die methodische Umsetzung validiert die Forschungsfrage angemessen", score: 3 },
+                        { text: "Die methodische Umsetzung validiert die Forschungsfrage gut", score: 4 },
+                        { text: "Die methodische Umsetzung validiert die Forschungsfrage sehr gut", score: 5 }
                     ]
                 }
             }
@@ -75,24 +74,24 @@ export const masterConfig: EvaluationConfig = {
             ...evaluationConfig.sections.form,
             criteria: {
                 ...evaluationConfig.sections.form.criteria,
-                approach: {
-                    ...evaluationConfig.sections.form.criteria.approach,
+                scientific_approach: {
+                    ...evaluationConfig.sections.form.criteria.scientific_approach,
                     options: [
-                        { text: "Die Bearbeitung folgt keinem wissenschaftlichen Forschungsansatz", score: 1 },
-                        { text: "Die Bearbeitung zeigt grundlegende wissenschaftliche Methodik", score: 2 },
-                        { text: "Die Bearbeitung folgt einer fundierten wissenschaftlichen Methodik", score: 3 },
-                        { text: "Die Bearbeitung demonstriert eine sehr gute wissenschaftliche Methodik und Forschungsansatz", score: 4 },
-                        { text: "Die Bearbeitung zeigt eine sehr fundierte wissenschaftliche Methodik mit eigenständigem Forschungsansatz", score: 5 }
+                        { text: "Die wissenschaftliche Methodik ist nicht erkennbar", score: 1 },
+                        { text: "Die wissenschaftliche Methodik ist grundlegend erkennbar", score: 2 },
+                        { text: "Die wissenschaftliche Methodik ist angemessen", score: 3 },
+                        { text: "Die wissenschaftliche Methodik ist gut und zeigt eigenständige Ansätze", score: 4 },
+                        { text: "Die wissenschaftliche Methodik ist sehr gut mit eigenständigen Ansätzen", score: 5 }
                     ]
                 },
-                source_usage: {
-                    ...evaluationConfig.sections.form.criteria.source_usage,
+                citation: {
+                    ...evaluationConfig.sections.form.criteria.citation,
                     options: [
-                        { text: "Forschungsstand wird kaum erfasst, Zitierung mangelhaft", score: 1 },
-                        { text: "Forschungsstand oberflächlich erfasst, Zitierung mit Mängeln", score: 2 },
-                        { text: "Forschungsstand gut erfasst, korrekte wissenschaftliche Zitierung", score: 3 },
-                        { text: "Forschungsstand umfassend erfasst, präzise wissenschaftliche Zitierung", score: 4 },
-                        { text: "Forschungsstand wird sehr gut aufgearbeitet, durchgehend präzise wissenschaftliche Zitierung", score: 5 }
+                        { text: "Der Forschungsstand wird unzureichend erfasst", score: 1 },
+                        { text: "Der Forschungsstand wird grundlegend erfasst", score: 2 },
+                        { text: "Der Forschungsstand wird angemessen erfasst und wissenschaftlich zitiert", score: 3 },
+                        { text: "Der Forschungsstand wird gut erfasst und wissenschaftlich präzise zitiert", score: 4 },
+                        { text: "Der Forschungsstand wird sehr gut erfasst und durchgängig präzise zitiert", score: 5 }
                     ]
                 }
             }
