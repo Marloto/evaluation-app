@@ -9,14 +9,15 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Weightable } from '@/lib/types/types';
 
 interface CriterionEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { title: string; weight: number }) => void;
+  onSave: (data: { title: string; weight: number; isBonus?: boolean }) => void;
   mode: 'add' | 'edit';
-  initialData?: Weightable;
+  initialData?: Weightable & { excludeFromTotal?: boolean };
 }
 
 export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
@@ -26,18 +27,27 @@ export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
   mode,
   initialData = { title: '', weight: 0.1 }
 }) => {
-  const memoizedInitialData = React.useMemo(() => initialData, [initialData.title, initialData.weight]);
-  const [formData, setFormData] = React.useState(initialData);
+  const memoizedInitialData = React.useMemo(() => initialData, [initialData.title, initialData.weight, initialData.excludeFromTotal]);
+  const [formData, setFormData] = React.useState({
+    title: initialData.title,
+    weight: initialData.weight,
+    isBonus: initialData.excludeFromTotal || false
+  });
 
   React.useEffect(() => {
-    setFormData(memoizedInitialData);
+    setFormData({
+      title: memoizedInitialData.title,
+      weight: memoizedInitialData.weight,
+      isBonus: memoizedInitialData.excludeFromTotal || false
+    });
   }, [memoizedInitialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
       title: formData.title,
-      weight: formData.weight
+      weight: formData.weight,
+      isBonus: formData.isBonus
     });
   };
 
@@ -66,11 +76,26 @@ export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
               value={formData.weight}
               onChange={(e) => setFormData(prev => ({ ...prev, weight: parseFloat(e.target.value) }))}
               placeholder="Weight"
-              step="0.1"
+              step="0.05"
               min="0"
               max="1"
               className="w-full"
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="isBonus"
+              checked={formData.isBonus}
+              onCheckedChange={(checked) => 
+                setFormData(prev => ({ ...prev, isBonus: checked === true }))
+              }
+            />
+            <Label 
+              htmlFor="isBonus" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Bonus criterion (excluded from total score calculation)
+            </Label>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>

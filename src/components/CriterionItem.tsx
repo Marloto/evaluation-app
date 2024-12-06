@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronRight, Plus, Edit2, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Edit2, Trash2, Star } from "lucide-react";
 import { useConfigurationManager } from './ConfigurationManager';
 import { CriterionEditDialog } from './dialogs/CriterionEditDialog';
 import DeleteConfirmDialog from './dialogs/DeleteConfirmDialog';
 import OptionList from './OptionList';
 import { Criterion } from '@/lib/types/types';
+import { Badge } from "@/components/ui/badge";
 
 interface CriterionItemProps {
     sectionKey: string;
@@ -13,6 +14,13 @@ interface CriterionItemProps {
     criterion: Criterion;
     isExpanded: boolean;
     onToggle: () => void;
+}
+
+interface CriterionListProps {
+    sectionKey: string;
+    criteria: Record<string, Criterion>;
+    expandedCriterion: string | null;
+    onExpand: (criterionKey: string | null) => void;
 }
 
 export const CriterionItem: React.FC<CriterionItemProps> = ({
@@ -52,12 +60,13 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
         });
     };
 
-    const handleEditSave = (data: { title: string; weight: number }) => {
+    const handleEditSave = (data: { title: string; weight: number; isBonus?: boolean }) => {
         configManager.updateCriterion(
             sectionKey,
             criterionKey,
             data.title,
-            data.weight
+            data.weight,
+            data.isBonus
         );
         handleDialogClose();
     };
@@ -80,7 +89,13 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
                     ) : (
                         <ChevronRight className="h-4 w-4" />
                     )}
-                    <span>{criterion.title}</span>
+                    <span className="truncate max-w-[200px]">{criterion.title}</span>
+                    {criterion.excludeFromTotal && (
+                        <Badge variant="secondary" className="ml-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                            <Star className="h-3 w-3 mr-1 fill-yellow-500 text-yellow-500" />
+                            Bonus
+                        </Badge>
+                    )}
                 </button>
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">
@@ -120,7 +135,8 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
                 mode="edit"
                 initialData={{
                     title: criterion.title,
-                    weight: criterion.weight
+                    weight: criterion.weight,
+                    excludeFromTotal: criterion.excludeFromTotal
                 }}
             />
 
@@ -135,13 +151,7 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
     );
 };
 
-interface CriterionListProps {
-    sectionKey: string;
-    criteria: Record<string, Criterion>;
-    expandedCriterion: string | null;
-    onExpand: (criterionKey: string | null) => void;
-}
-
+// CriterionList component remains largely the same, just needs to pass the new isBonus parameter
 export const CriterionList: React.FC<CriterionListProps> = ({
     sectionKey,
     criteria,
@@ -163,11 +173,12 @@ export const CriterionList: React.FC<CriterionListProps> = ({
         setDialogState({ isOpen: false });
     };
 
-    const handleDialogSave = (data: { title: string; weight: number }) => {
+    const handleDialogSave = (data: { title: string; weight: number; isBonus?: boolean }) => {
         configManager.addCriterion(
             sectionKey,
             data.title,
-            data.weight
+            data.weight,
+            data.isBonus
         );
         handleDialogClose();
     };

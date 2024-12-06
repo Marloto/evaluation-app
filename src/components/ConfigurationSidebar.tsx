@@ -1,14 +1,16 @@
+// ConfigurationSidebar.tsx
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Settings2, RotateCcw } from "lucide-react";
+import { X, Settings2, Save, FolderOpen } from "lucide-react";
 import { useConfig } from './providers/ConfigProvider';
 import { useGrades } from './GradeProvider';
 import { cn } from "@/lib/utils/misc";
 import { SectionList } from './SectionItem';
 import GradeConfigDialog from './dialogs/GradeConfigDialog';
+import SaveConfigDialog from './dialogs/SaveConfigDialog';
+import ManageTemplatesDialog from './dialogs/ManageTemplatesDialog';
 import { GradeThreshold } from '@/lib/types/types';
-import DeleteConfirmDialog from './dialogs/DeleteConfirmDialog';
 
 interface ConfigurationSidebarProps {
     isOpen: boolean;
@@ -19,24 +21,16 @@ export const ConfigurationSidebar: React.FC<ConfigurationSidebarProps> = ({
     isOpen,
     onToggle
 }) => {
-    const { config, resetToDefault } = useConfig();
+    const { config, templates, saveTemplate, deleteTemplate } = useConfig();
     const { config: gradeConfig, updateConfig: updateGradeConfig } = useGrades();
     const [expandedSection, setExpandedSection] = useState<string | null>(null);
     const [expandedCriterion, setExpandedCriterion] = useState<string | null>(null);
     const [isGradeDialogOpen, setIsGradeDialogOpen] = useState(false);
-    const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+    const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
 
     const handleGradeConfigSave = (thresholds: GradeThreshold[]) => {
         updateGradeConfig({ thresholds });
-    };
-
-    const handleResetConfig = () => {
-        setShowResetConfirm(true);
-    };
-
-    const handleResetConfirm = () => {
-        resetToDefault();
-        setShowResetConfirm(false);
     };
 
     return (
@@ -66,25 +60,14 @@ export const ConfigurationSidebar: React.FC<ConfigurationSidebarProps> = ({
                             <h2 className="text-xl font-semibold">Configuration</h2>
                             <p className="text-sm text-gray-500">Manage evaluation structure and criteria</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleResetConfig}
-                                className="gap-2"
-                            >
-                                <RotateCcw className="h-4 w-4" />
-                                Reset to Default
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={onToggle}
-                                className="hover:bg-gray-200"
-                            >
-                                <X className="h-5 w-5" />
-                            </Button>
-                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={onToggle}
+                            className="hover:bg-gray-200"
+                        >
+                            <X className="h-5 w-5" />
+                        </Button>
                     </div>
 
                     {/* Content */}
@@ -100,8 +83,26 @@ export const ConfigurationSidebar: React.FC<ConfigurationSidebarProps> = ({
                         </div>
                     </ScrollArea>
 
-                    {/* Grade Configuration Button */}
-                    <div className="p-6 border-t">
+                    {/* Footer Actions */}
+                    <div className="p-6 border-t space-y-2">
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={() => setIsSaveDialogOpen(true)}
+                                variant="outline"
+                                className="flex-1"
+                            >
+                                <Save className="h-4 w-4 mr-2" />
+                                Save Configuration
+                            </Button>
+                            <Button
+                                onClick={() => setIsManageDialogOpen(true)}
+                                variant="outline"
+                                className="flex-1"
+                            >
+                                <FolderOpen className="h-4 w-4 mr-2" />
+                                Manage Templates
+                            </Button>
+                        </div>
                         <Button
                             onClick={() => setIsGradeDialogOpen(true)}
                             variant="outline"
@@ -114,7 +115,7 @@ export const ConfigurationSidebar: React.FC<ConfigurationSidebarProps> = ({
                 </div>
             </div>
 
-            {/* Grade Configuration Dialog */}
+            {/* Dialogs */}
             <GradeConfigDialog
                 isOpen={isGradeDialogOpen}
                 onClose={() => setIsGradeDialogOpen(false)}
@@ -122,13 +123,17 @@ export const ConfigurationSidebar: React.FC<ConfigurationSidebarProps> = ({
                 onSave={handleGradeConfigSave}
             />
             
-            {/* Reset Configuration Confirmation Dialog */}
-            <DeleteConfirmDialog
-                isOpen={showResetConfirm}
-                onClose={() => setShowResetConfirm(false)}
-                onConfirm={handleResetConfirm}
-                title="Reset Configuration"
-                description="Are you sure you want to reset the configuration to its default state? This will remove all custom sections, criteria, and options. This action cannot be undone."
+            <SaveConfigDialog
+                isOpen={isSaveDialogOpen}
+                onClose={() => setIsSaveDialogOpen(false)}
+                onSave={saveTemplate}
+            />
+
+            <ManageTemplatesDialog
+                isOpen={isManageDialogOpen}
+                onClose={() => setIsManageDialogOpen(false)}
+                templates={templates}
+                onDelete={deleteTemplate}
             />
         </>
     );

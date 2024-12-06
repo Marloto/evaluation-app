@@ -139,8 +139,8 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
 
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-500">
-                      {score > 0 &&
-                        `${score}`
+                      {sectionScore > 0 &&
+                        `${sectionScore}`
                       }
                     </span>
                     <span className="text-xs text-gray-400">

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Settings, RotateCcw, Download, Upload } from 'lucide-react';
@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { toast } from "sonner";  // shadcn verwendet sonner für Toasts
 import StarRating from './StarRating';
 import { Criterion as CriterionType, EvaluationConfig, GradeConfig, Option, Section } from '@/lib/types/types';
+import TemplateResetDialog from './dialogs/TemplateResetDialog';
 
 // Typ für die gespeicherte Konfiguration
 interface SavedConfiguration {
@@ -45,7 +46,7 @@ const downloadJson = (data: SavedConfiguration, filename: string) => {
 };
 
 const EvaluationContent = () => {
-    const { config, updateConfig } = useConfig();
+    const { config, updateConfig, templates, loadTemplate } = useConfig();
     const {
         state,
         updateCriterion,
@@ -57,10 +58,19 @@ const EvaluationContent = () => {
     const { config: gradeConfig, updateConfig: updateGradeConfig } = useGrades();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [editingPreamble, setEditingPreamble] = useState<string | null>(null);
-    const [preambleText, setPreambleText] = useState<string>('');
+    const [preambleTexts, setPreambleTexts] = useState<Record<string, string>>({});
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Effekt zum Initialisieren der Preamble-Texte aus dem State
+    useEffect(() => {
+        const initialPreambles: Record<string, string> = {};
+        Object.entries(state.sections).forEach(([sectionKey, sectionState]) => {
+            initialPreambles[sectionKey] = sectionState.preamble || '';
+        });
+        setPreambleTexts(initialPreambles);
+    }, []);
 
     // Funktion zum Herunterladen der aktuellen Konfiguration
     const handleDownload = () => {
@@ -109,15 +119,30 @@ const EvaluationContent = () => {
         reader.readAsText(file);
     };
 
-    // Wird bei jeder Texteingabe aufgerufen
+    // Aktualisieren Sie die handlePreambleChange-Funktion
     const handlePreambleChange = (text: string) => {
-        setPreambleText(text);
+        if (editingPreamble) {
+            setPreambleTexts(prev => ({
+                ...prev,
+                [editingPreamble]: text
+            }));
+        }
     };
 
-    // Wird nur beim Speichern aufgerufen
+    // Aktualisieren Sie die handlePreambleSave-Funktion
     const handlePreambleSave = (sectionKey: string) => {
-        updatePreamble(sectionKey, preambleText);
+        updatePreamble(sectionKey, preambleTexts[sectionKey] || '');
         setEditingPreamble(null);
+    };
+
+    // Neue Funktion zum Starten der Bearbeitung
+    const startEditing = (sectionKey: string) => {
+        // Initialisiere den Text mit dem bestehenden Preamble oder leerem String
+        setPreambleTexts(prev => ({
+            ...prev,
+            [sectionKey]: state.sections[sectionKey]?.preamble || prev[sectionKey] || ''
+        }));
+        setEditingPreamble(sectionKey);
     };
 
     const handleCriterionUpdate = (sectionKey: string, criterionKey: string, update: {
@@ -125,6 +150,12 @@ const EvaluationContent = () => {
         customText?: string;
     }) => {
         updateCriterion(sectionKey, criterionKey, update);
+    };
+
+    const handleTemplateLoad = (templateId: string) => {
+        loadTemplate(templateId);
+        resetAll();
+        setIsResetDialogOpen(false);
     };
 
     const renderSection = (sectionKey: string, section: Section) => {
@@ -152,7 +183,7 @@ const EvaluationContent = () => {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setEditingPreamble(sectionKey)}
+                        onClick={() => startEditing(sectionKey)}
                     >
                         <PenSquare className="h-4 w-4" />
                     </Button>
@@ -161,7 +192,7 @@ const EvaluationContent = () => {
                 {editingPreamble === sectionKey ? (
                     <div className="mb-4">
                         <Textarea
-                            value={preambleText}
+                            value={preambleTexts[sectionKey] || ''}
                             onChange={(e) => handlePreambleChange(e.target.value)}
                             placeholder="Enter a preamble for this section..."
                             className="min-h-[100px]"
@@ -293,6 +324,13 @@ const EvaluationContent = () => {
                     resetAll();
                     setIsResetDialogOpen(false);
                 }}
+            />
+
+            <TemplateResetDialog
+                isOpen={isResetDialogOpen}
+                onClose={() => setIsResetDialogOpen(false)}
+                onConfirm={handleTemplateLoad}
+                templates={templates}
             />
         </div>
     );

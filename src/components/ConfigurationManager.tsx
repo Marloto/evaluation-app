@@ -9,8 +9,8 @@ interface ConfigurationContextValue {
   updateSection: (sectionKey: string, title: string, weight: number) => void;
   deleteSection: (sectionKey: string) => void;
   
-  addCriterion: (sectionKey: string, title: string, weight: number) => void;
-  updateCriterion: (sectionKey: string, criterionKey: string, title: string, weight: number) => void;
+  addCriterion: (sectionKey: string, title: string, weight: number, isBonus?: boolean) => void;
+  updateCriterion: (sectionKey: string, criterionKey: string, title: string, weight: number, isBonus?: boolean) => void;
   deleteCriterion: (sectionKey: string, criterionKey: string) => void;
   
   addOption: (sectionKey: string, criterionKey: string, text: string, score: number) => void;
@@ -56,7 +56,12 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     updateConfig(newConfig);
   }, [config, updateConfig]);
 
-  const addCriterion = useCallback((sectionKey: string, title: string, weight: number) => {
+  const addCriterion = useCallback((
+    sectionKey: string, 
+    title: string, 
+    weight: number,
+    isBonus?: boolean
+  ) => {
     const newConfig = { ...config };
     if (!newConfig.sections[sectionKey]) return;
     
@@ -64,6 +69,7 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     newConfig.sections[sectionKey].criteria[criterionKey] = {
       title,
       weight,
+      excludeFromTotal: isBonus,
       options: []
     };
     
@@ -74,7 +80,8 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     sectionKey: string,
     criterionKey: string,
     title: string,
-    weight: number
+    weight: number,
+    isBonus?: boolean
   ) => {
     const newConfig = { ...config };
     if (!newConfig.sections[sectionKey]?.criteria[criterionKey]) return;
@@ -82,7 +89,8 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     newConfig.sections[sectionKey].criteria[criterionKey] = {
       ...newConfig.sections[sectionKey].criteria[criterionKey],
       title,
-      weight
+      weight,
+      excludeFromTotal: isBonus
     };
     
     updateConfig(newConfig);

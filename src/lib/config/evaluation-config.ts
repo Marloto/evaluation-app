@@ -30,14 +30,14 @@ export const evaluationConfig: EvaluationConfig = {
             ]
           },
           implementation: {
-            title: "Praktische Umsetzung",
+            title: "Umsetzung",
             weight: 0.4,
             options: [
-              { text: "Die praktische Implementierung weist grundlegende Mängel auf und erfüllt die Anforderungen nur unzureichend", score: 1 },
-              { text: "Die praktische Implementierung erfüllt die grundlegenden Anforderungen, zeigt aber Optimierungspotential in Architektur und Code-Qualität", score: 2 },
-              { text: "Die praktische Implementierung ist solide umgesetzt mit angemessener Architektur und guter Code-Qualität", score: 3 },
-              { text: "Die praktische Implementierung überzeugt durch durchdachte Architektur, sehr gute Code-Qualität und effiziente Problemlösung", score: 4 },
-              { text: "Die praktische Implementierung ist sehr gut strukturiert mit durchdachter Architektur, sauberem, wartbarem Code und zeigt fundiertes technisches Verständnis", score: 5 }
+              { text: "Die Umsetzung weist grundlegende Mängel auf und erfüllt die Anforderungen nur unzureichend", score: 1 },
+              { text: "Die Umsetzung erfüllt die grundlegenden Anforderungen, zeigt aber Optimierungspotential in Architektur und Code-Qualität", score: 2 },
+              { text: "Die Umsetzung ist solide umgesetzt mit einem angemessenen Ansatz", score: 3 },
+              { text: "Die Umsetzung überzeugt durch einen durchdachten Ansatz mit effizienter Problemlösung", score: 4 },
+              { text: "Die Umsetzung ist sehr gut strukturiert, präsentiert einen Ansatz und zeigt fundiertes technisches Verständnis", score: 5 }
             ]
           }
         }
@@ -53,8 +53,8 @@ export const evaluationConfig: EvaluationConfig = {
               { text: "Die Bearbeitung folgt keinem klaren wissenschaftlichen Vorgehen", score: 1 },
               { text: "Die Bearbeitung folgt einem wissenschaftlichen Vorgehen", score: 2 },
               { text: "Die Bearbeitung folgt einem wissenschaftlichen Vorgehen", score: 3 },
-              { text: "Die Bearbeitung folgt einem klaren wissenschaftlichen Vorgehen", score: 4 },
-              { text: "Die Bearbeitung folgt einem klaren wissenschaftlichen Vorgehen zur Beantwortung der Fragestellung", score: 5 }
+              { text: "Die Bearbeitung folgt einem guten wissenschaftlichen Vorgehen", score: 4 },
+              { text: "Die Bearbeitung folgt einem klaren wissenschaftlichen Vorgehen", score: 5 }
             ]
           },
           research_question: {
@@ -91,13 +91,13 @@ export const evaluationConfig: EvaluationConfig = {
             ]
           },
           source_usage: {
-            title: "Quellenarbeit",
+            title: "Quellenarbeit und Zitierung",
             weight: 0.1,
             options: [
               { text: "Quellen werden kaum verwendet, die Zitierung ist fehlerhaft", score: 1 },
               { text: "Quellen werden verwendet, die Zitierung weist häufig Mängel auf", score: 2 },
               { text: "Quellen werden angemessen verwendet, die Zitierung ist größtenteils korrekt", score: 3 },
-              { text: "Unterschiedliche Quellen werden gut verwendet, die Zitierung ist überwiegend sauber", score: 4 },
+              { text: "Unterschiedliche Quellen werden gut verwendet, die Zitierung ist sauber", score: 4 },
               { text: "Unterschiedliche und geeignete Quellen werden verwendet, deren Auswahl nachvollziehbar und gut aufgearbeitet ist. Die Zitierung erfolgt durchgehend sauber", score: 5 }
             ]
           },
@@ -109,7 +109,7 @@ export const evaluationConfig: EvaluationConfig = {
               { text: "Die Durchführung ist teilweise verständlich, der Versuchsaufbau oberflächlich beschrieben", score: 2 },
               { text: "Die Durchführung ist nachvollziehbar, der Versuchsaufbau ausreichend beschrieben", score: 3 },
               { text: "Die Durchführung ist gut verständlich, der Versuchsaufbau klar dargestellt", score: 4 },
-              { text: "Die Durchführung umfasst eine verständliche Darstellung des Versuchsaufbaus und der -durchführung, insbesondere für die Lösungsstrategien und deren Umsetzung", score: 5 }
+              { text: "Die Durchführung umfasst eine verständliche Darstellung des Versuchsaufbaus und der -durchführung", score: 5 }
             ]
           },
           evaluation: {
@@ -127,33 +127,33 @@ export const evaluationConfig: EvaluationConfig = {
       },
       structure: {
         title: "Gliederung",
-        weight: 0.2,
+        weight: 0.15,
         criteria: {
-          structure_logic: {
+          outline: {
+            title: "Gliederung",
+            weight: 0.5,
+            options: [
+              { text: "Die Gliederung ist unübersichtlich und folgt keiner erkennbaren Logik", score: 1 },
+              { text: "Die Gliederung zeigt eine grundlegende Struktur, aber mit schwacher logischer Verknüpfung der Kapitel", score: 2 },
+              { text: "Die Gliederung ist nachvollziehbar aufgebaut mit erkennbarer Progression von Grundlagen über Hauptteil zur Auswertung", score: 3 },
+              { text: "Die Gliederung ist gut durchdacht mit klarer thematischer Entwicklung", score: 4 },
+              { text: "Die Gliederung zeigt eine schlüssige Struktur und durchgängige thematische Entwicklung", score: 5 }
+            ]
+          },
+          structure: {
             title: "Struktureller Aufbau",
-            weight: 0.4,
+            weight: 0.35,
             options: [
-              { text: "Die Gliederung ist unübersichtlich und folgt keiner erkennbaren Logik. Zentrale Aspekte der Arbeit spiegeln sich nicht in der Struktur wider", score: 1 },
-              { text: "Die Gliederung zeigt eine grundlegende Struktur, aber mit schwacher logischer Verknüpfung der Kapitel. Der rote Faden ist nur teilweise erkennbar", score: 2 },
-              { text: "Die Gliederung ist nachvollziehbar aufgebaut mit erkennbarer Progression von Grundlagen über Hauptteil zur Auswertung. Die Kapitel bauen logisch aufeinander auf", score: 3 },
-              { text: "Die Gliederung ist gut durchdacht mit klarer thematischer Entwicklung. Die Kapitel sind sinnvoll verknüpft und führen zielgerichtet durch die Arbeit", score: 4 },
-              { text: "Die Gliederung zeigt eine sehr schlüssige Struktur und durchgängige thematische Entwicklung. Die Kapitel sind gut verzahnt und bilden einen klaren Argumentationsfluss von der Einleitung bis zum Fazit", score: 5 }
+              { text: "Zentrale Aspekte der Arbeit spiegeln sich nicht in der Struktur wider", score: 1 },
+              { text: "Der rote Faden ist nur teilweise erkennbar", score: 2 },
+              { text: "Die Kapitel bauen logisch aufeinander auf", score: 3 },
+              { text: "Die Kapitel sind sinnvoll verknüpft und führen zielgerichtet durch die Arbeit", score: 4 },
+              { text: "Die Kapitel sind gut verzahnt und bilden einen klaren Argumentationsfluss von der Einleitung bis zum Fazit", score: 5 }
             ]
           },
-          depth_balance: {
-            title: "Gliederungstiefe und Gewichtung",
-            weight: 0.3,
-            options: [
-              { text: "Die Gliederungstiefe ist stark unausgewogen. Wichtige Bereiche sind zu oberflächlich, während nebensächliche Aspekte übermäßig untergliedert sind", score: 1 },
-              { text: "Die Gliederungstiefe zeigt Ungleichgewichte. Die Gewichtung der Kapitel entspricht nicht durchgängig ihrer inhaltlichen Bedeutung", score: 2 },
-              { text: "Die Gliederungstiefe ist angemessen mit weitgehend ausgewogener Behandlung der verschiedenen Themenbereiche", score: 3 },
-              { text: "Die Gliederungstiefe ist gut gewählt mit klarem Fokus auf den relevanten Aspekten. Die Gewichtung der Kapitel spiegelt ihre Bedeutung wider", score: 4 },
-              { text: "Die Gliederungstiefe ist durchgängig angemessen mit sehr guter Balance zwischen allen Arbeitsteilen. Die Untergliederung folgt konsequent der inhaltlichen Relevanz", score: 5 }
-            ]
-          },
-          formal_quality: {
+          quality: {
             title: "Formale Qualität",
-            weight: 0.3,
+            weight: 0.15,
             options: [
               { text: "Die formale Umsetzung weist erhebliche Mängel auf. Nummerierung inkonsistent, Überschriften unpräzise, Gliederungsebenen unklar", score: 1 },
               { text: "Die formale Umsetzung zeigt mehrere Schwächen. Teilweise inkonsistente Formulierungen oder unklare Hierarchien in den Gliederungsebenen", score: 2 },
@@ -204,6 +204,7 @@ export const evaluationConfig: EvaluationConfig = {
           complexity: {
             title: "Technische Komplexität und Verständnis",
             weight: 0.25,
+            excludeFromTotal: true,
             options: [
               { text: "Die Arbeit zeigt nur oberflächliches Verständnis der behandelten Technologien", score: 1 },
               { text: "Die Arbeit behandelt wenige Technologien mit grundlegendem Verständnis", score: 2 },

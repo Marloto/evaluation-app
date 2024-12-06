@@ -21,25 +21,36 @@ export interface EvaluationState {
 export const calculateSectionScore = (
     section: Section,
     sectionState: SectionState | undefined
-): { score: number; validCriteria: number; totalCriteria: number } => {
+): { 
+    score: number; 
+    validCriteria: number; 
+    totalCriteria: number;
+    optionalCriteria: number;
+} => {
     let weightedSum = 0;
     let totalWeight = 0;
     let validCriteria = 0;
+    let optionalCriteria = 0;
+    
+    // Zähle nur nicht-optionale Kriterien für die Pflicht-Gesamtzahl
     const totalCriteria = Object.values(section.criteria)
         .filter(c => !c.excludeFromTotal).length;
 
-    // Berechne gewichtete Summe und Gesamtgewicht
+    // Berechne gewichtete Summe für alle ausgewählten Kriterien
     Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
-        if (criterion.excludeFromTotal) {
-            return;
-        }
-
         const score = sectionState?.criteria[criterionKey]?.score;
-        if (score !== undefined) {
-            weightedSum += score * criterion.weight;
-            totalWeight += criterion.weight;
+        if (score === undefined) return;
+
+        // Zähle ausgewählte Kriterien
+        if (criterion.excludeFromTotal) {
+            optionalCriteria++;
+        } else {
             validCriteria++;
         }
+
+        // Fließt in jedem Fall in die Gesamtberechnung ein
+        weightedSum += score * criterion.weight;
+        totalWeight += criterion.weight;
     });
 
     // Normalisiere das Ergebnis
@@ -48,7 +59,8 @@ export const calculateSectionScore = (
     return {
         score: Number(normalizedScore.toFixed(2)),
         validCriteria,
-        totalCriteria
+        totalCriteria,
+        optionalCriteria
     };
 };
 
@@ -58,21 +70,34 @@ export const calculateSectionScore = (
 export const calculateTotalScore = (
     sections: Record<string, Section>,
     evaluationState: EvaluationState
-): { score: number; percentage: number, validCriteria: number, totalCriteria: number } => {
+): { 
+    score: number; 
+    percentage: number;
+    validCriteria: number;
+    totalCriteria: number;
+    optionalCriteria: number;
+} => {
     let weightedSum = 0;
     let totalWeight = 0;
     let allValidCriteria = 0;
     let allTotalCriteria = 0;
+    let allOptionalCriteria = 0;
 
     // Berechne gewichtete Summe und Gesamtgewicht über alle Sektionen
     Object.entries(sections).forEach(([sectionKey, section]) => {
         const sectionState = evaluationState.sections[sectionKey];
-        const { score, validCriteria, totalCriteria } = calculateSectionScore(section, sectionState);
+        const { 
+            score, 
+            validCriteria, 
+            totalCriteria,
+            optionalCriteria
+        } = calculateSectionScore(section, sectionState);
         
         weightedSum += score * section.weight;
         totalWeight += section.weight;
         allValidCriteria += validCriteria;
         allTotalCriteria += totalCriteria;
+        allOptionalCriteria += optionalCriteria;
     });
 
     // Normalisiere das Gesamtergebnis
@@ -85,7 +110,8 @@ export const calculateTotalScore = (
         score: Number(normalizedScore.toFixed(1)),
         percentage: Number(percentage.toFixed(1)),
         validCriteria: allValidCriteria,
-        totalCriteria: allTotalCriteria
+        totalCriteria: allTotalCriteria,
+        optionalCriteria: allOptionalCriteria
     };
 };
 
@@ -104,8 +130,8 @@ export const validateWeights = (
 
     const invalidSections = Object.entries(sections)
         .map(([key, section]) => {
+            // Prüfe die Gewichtssumme aller Kriterien in einer Sektion
             const criteriaWeightSum = Object.values(section.criteria)
-                .filter(c => !c.excludeFromTotal)
                 .reduce((sum, criterion) => sum + criterion.weight, 0);
             
             return {
