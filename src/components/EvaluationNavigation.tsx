@@ -8,7 +8,9 @@ import {
   AlertCircle,
   Loader2,
   FileText,
-  BarChart2
+  BarChart2,
+  ClipboardList,
+  StickyNote
 } from 'lucide-react';
 import { cn } from "@/lib/utils/misc";
 import {
@@ -22,6 +24,9 @@ import AnalyticsDialog from './dialogs/AnalyticsDialog';
 import StarRating from './StarRating';
 import { calculateSectionScore, calculateTotalScore } from '@/lib/utils/calculation';
 import { generateFullText } from '@/lib/utils/text-generation';
+import CriteriaOverview from './dialogs/CriteriaOverview';
+import NotesDialog from './dialogs/NotesDialog';
+
 
 interface NavigationProps {
   sections: Record<string, Section>;
@@ -51,6 +56,8 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
 }) => {
   const [showFullText, setShowFullText] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showCriteriaOverview, setShowCriteriaOverview] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
 
   // Calculate total score
   const { score, percentage, validCriteria, totalCriteria } = useMemo(() =>
@@ -80,6 +87,18 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         </div>
       </Card>
 
+      {/* Notes Section */}
+      <div className="space-y-2">
+        <Button
+            className="w-full"
+            variant="outline"
+            onClick={() => setShowNotes(true)}
+        >
+            <StickyNote className="h-4 w-4 mr-2" />
+            Notes
+        </Button>
+      </div>
+
       {/* Progress and Sections */}
       <Card className="p-4">
         {/* Overall Progress */}
@@ -101,7 +120,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         </div>
 
         {/* Sections Navigation */}
-        <ScrollArea className="h-[calc(100vh-400px)]">
+        <ScrollArea className="h-[calc(100vh-480px)]">
           <div className="space-y-2">
             {Object.entries(sections).map(([sectionKey, section]) => {
               const { score: sectionScore, validCriteria: sectionValidCriteria, totalCriteria: sectionTotalCriteria } =
@@ -190,6 +209,15 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
           <BarChart2 className="h-4 w-4 mr-2" />
           View Analytics
         </Button>
+
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => setShowCriteriaOverview(true)}
+        >
+          <ClipboardList className="h-4 w-4 mr-2" />
+          Kriterienübersicht
+        </Button>
       </div>
 
       {/* Complete Text Dialog */}
@@ -217,6 +245,17 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         onClose={() => setShowAnalytics(false)}
         sections={sections}
         sectionScores={evaluationState.sections}
+      />
+
+      <CriteriaOverview 
+        sections={sections}
+        isOpen={showCriteriaOverview}
+        onClose={() => setShowCriteriaOverview(false)}
+      />
+
+      <NotesDialog
+          isOpen={showNotes}
+          onClose={() => setShowNotes(false)}
       />
     </div>
   );

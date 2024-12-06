@@ -232,7 +232,7 @@ const AnalyticsDialog: React.FC<AnalyticsDialogProps> = ({
                             showEmpty={false}
                         />
                         <span className="text-gray-500">
-                            {achievedPercentage / 100 * (5)}
+                            {(achievedPercentage / 100 * (5)).toFixed(1)}
                         </span>
                     </div>
                 </div>

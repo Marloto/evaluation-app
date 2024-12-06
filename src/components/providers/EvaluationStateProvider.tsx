@@ -17,6 +17,7 @@ interface SectionState {
 export interface EvaluationState {
     sections: Record<string, SectionState>;
     activeSection: string | null;
+    notes: string; // Add this new field
 }
 
 interface EvaluationContextType {
@@ -27,6 +28,7 @@ interface EvaluationContextType {
     resetSection: (sectionKey: string) => void;
     resetAll: () => void;
     loadState: (newState: EvaluationState) => void; // Neue Funktion
+    updateNotes: (notes: string) => void; // Add this new function
 }
 
 const EvaluationContext = createContext<EvaluationContextType | undefined>(undefined);
@@ -42,7 +44,8 @@ const createInitialState = (sections: Record<string, Section>): EvaluationState 
     });
     return {
         sections: initial,
-        activeSection: Object.keys(sections)[0] || null
+        activeSection: Object.keys(sections)[0] || null,
+        notes: ''
     };
 };
 
@@ -60,6 +63,13 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
         createInitialState(sections)
     );
 
+    const updateNotes = (notes: string) => {
+        setState(prev => ({
+          ...prev,
+          notes
+        }));
+    };
+
     // Lade den State aus dem localStorage erst nach dem ersten Render
     useEffect(() => {
         try {
@@ -69,16 +79,17 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
                 // Validiere und aktualisiere den gespeicherten Zustand
                 const validSections = Object.keys(sections);
                 const validatedSections: Record<string, SectionState> = {};
-
+    
                 validSections.forEach(sectionKey => {
                     validatedSections[sectionKey] = parsedState.sections[sectionKey] || {
                         criteria: {}
                     };
                 });
-
+    
                 setState({
                     sections: validatedSections,
-                    activeSection: parsedState.activeSection || validSections[0] || null
+                    activeSection: parsedState.activeSection || validSections[0] || null,
+                    notes: parsedState.notes || '' // Füge notes hinzu, mit Fallback auf leeren String
                 });
             }
         } catch (error) {
@@ -167,7 +178,8 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
                 setActiveSection,
                 resetSection,
                 resetAll,
-                loadState // Neue Funktion
+                loadState,
+                updateNotes
             }}
         >
             {children}

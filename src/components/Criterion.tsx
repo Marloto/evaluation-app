@@ -59,23 +59,33 @@ const Criterion = ({
       <div className="p-4">
         {/* Header Section */}
         <button
-          className="w-full flex items-center justify-between hover:text-green-600 transition-colors"
+          className="w-full hover:text-green-600 transition-colors"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <div className="flex items-center gap-2">
-            {isExpanded ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <ChevronRight className="h-4 w-4" />
-            )}
-            <span className="font-medium">{title}</span>
-          </div>
-          {hasValue && (
+          {/* Erste Zeile mit Titel und Rating */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <StarRating score={value} size="sm" />
-              <span className="text-sm text-gray-500">
-                ({value})
-              </span>
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+              <span className="font-medium">{title}</span>
+            </div>
+            {hasValue && (
+              <div className="flex items-center gap-2">
+                <StarRating score={value} size="sm" />
+                <span className="text-sm text-gray-500">
+                  ({value})
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Zweite Zeile mit Text */}
+          {!isExpanded && hasValue && (
+            <div className="text-sm text-gray-600 mt-2 pl-6 text-left">
+              {customText || selectedOption?.text}
             </div>
           )}
         </button>

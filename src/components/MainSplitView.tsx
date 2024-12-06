@@ -229,13 +229,6 @@ const EvaluationContent = () => {
                         onUpdate={(update) => handleCriterionUpdate(sectionKey, criterionKey, update)}
                     />
                 ))}
-
-                <div className="mt-4 p-4 bg-gray-50 rounded-md">
-                    <h4 className="font-medium mb-2">Section Text</h4>
-                    <p className="text-sm">
-                        {generateSectionText(section, state.sections[sectionKey]) || "No criteria selected yet."}
-                    </p>
-                </div>
             </div>
         );
     };

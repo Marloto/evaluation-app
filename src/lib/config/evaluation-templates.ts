@@ -82,7 +82,7 @@ export const masterConfig: EvaluationConfig = {
                         { text: "Die Bearbeitung zeigt grundlegende wissenschaftliche Methodik", score: 2 },
                         { text: "Die Bearbeitung folgt einer fundierten wissenschaftlichen Methodik", score: 3 },
                         { text: "Die Bearbeitung demonstriert eine sehr gute wissenschaftliche Methodik und Forschungsansatz", score: 4 },
-                        { text: "Die Bearbeitung zeigt eine sehr fundierte wissenschaftliche Methodik mit innovativem Forschungsansatz", score: 5 }
+                        { text: "Die Bearbeitung zeigt eine sehr fundierte wissenschaftliche Methodik mit eigenständigem Forschungsansatz", score: 5 }
                     ]
                 },
                 source_usage: {
