@@ -36,7 +36,7 @@ jobs:
       - name: Build with Next.js
         run: npm run build
         env:
-          BASE_PATH: /thesis-evaluation
+          BASE_PATH: /evaluation-app
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
