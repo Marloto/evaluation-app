@@ -32,3 +32,24 @@ export interface GradeThreshold {
 export interface GradeConfig {
     thresholds: GradeThreshold[];
 }
+
+export interface BaseTemplate {
+    id: string;
+    name: string;
+    description: string;
+    config: EvaluationConfig;
+}
+
+export interface DefaultTemplate extends BaseTemplate {
+    type: 'default';
+    version: string;
+    lastUpdated: string;
+}
+
+export interface SavedTemplate extends BaseTemplate {
+    type: 'saved';
+    createdAt: string;
+    modifiedAt: string;
+}
+
+export type Template = DefaultTemplate | SavedTemplate;

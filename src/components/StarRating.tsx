@@ -24,56 +24,50 @@ const StarRating = ({
   };
 
   const renderStars = () => {
-    const stars = [];
     const totalStars = Math.floor(maxScore);
-    const decimal = score % 1;
     const fullStars = Math.floor(score);
+    const decimal = score % 1;
     
-    // Add filled stars
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Star 
-          key={`star-${i}`}
-          size={sizeMap[size].star}
-          className="fill-green-700 text-green-700"
-        />
+    return Array.from({ length: totalStars }).map((_, index) => {
+      // Bestimme den Stern-Typ für diese Position
+      const isFilled = index < fullStars;
+      const isHalf = !isFilled && index === fullStars && decimal >= 0.25;
+      const isNearlFull = !isFilled && index === fullStars && decimal >= 0.75;
+
+      return (
+        <div 
+          key={index} 
+          className="relative"
+          style={{
+            width: `${sizeMap[size].star}px`,
+            height: `${sizeMap[size].star}px`
+          }}
+        >
+          {/* Base empty star */}
+          {showEmpty && (
+            <Star
+              size={sizeMap[size].star}
+              className="absolute top-0 left-0 text-gray-300"
+            />
+          )}
+          
+          {/* Filled or half star overlay */}
+          {(isFilled || isHalf || isNearlFull) && (
+            isHalf ? (
+              <StarHalf
+                size={sizeMap[size].star}
+                className="absolute top-0 left-0 fill-green-700 text-green-700"
+              />
+            ) : (
+              <Star
+                size={sizeMap[size].star}
+                className="absolute top-0 left-0 fill-green-700 text-green-700"
+              />
+            )
+          )}
+        </div>
       );
-    }
-    
-    // Add half star if needed
-    if (decimal >= 0.25 && decimal < 0.75) {
-      stars.push(
-        <StarHalf
-          key="star-half"
-          size={sizeMap[size].star}
-          className="fill-green-700 text-green-700"
-        />
-      );
-    } else if (decimal >= 0.75) {
-      stars.push(
-        <Star
-          key="star-rounded"
-          size={sizeMap[size].star}
-          className="fill-green-700 text-green-700"
-        />
-      );
-    }
-    
-    // Add empty stars
-    if (showEmpty) {
-      const emptyStars = totalStars - Math.ceil(score);
-      for (let i = 0; i < emptyStars; i++) {
-        stars.push(
-          <Star
-            key={`star-empty-${i}`}
-            size={sizeMap[size].star}
-            className="text-gray-300"
-          />
-        );
-      }
-    }
-    
-    return stars;
+    });
   };
 
   return (

@@ -1,3 +1,4 @@
+// TemplateResetDialog.tsx
 import React from 'react';
 import {
     AlertDialog,
@@ -16,16 +17,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { isDefaultTemplate } from '@/lib/config/evaluation-templates';
+import { Template } from '@/lib/types/types';
+import { format } from 'date-fns';
 
 interface TemplateResetDialogProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: (templateId: string) => void;
-    templates: Array<{
-        id: string;
-        name: string;
-        type: 'default' | 'saved';
-    }>;
+    templates: Template[];
 }
 
 const TemplateResetDialog = ({
@@ -34,7 +34,10 @@ const TemplateResetDialog = ({
     onConfirm,
     templates
 }: TemplateResetDialogProps) => {
-    const [selectedTemplate, setSelectedTemplate] = React.useState<string>('bachelor');
+    const [selectedTemplate, setSelectedTemplate] = React.useState<string>(templates[0]?.id || '');
+
+    // Get the selected template for description
+    const selectedTemplateInfo = templates.find(t => t.id === selectedTemplate);
 
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -46,8 +49,7 @@ const TemplateResetDialog = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 
-                {/* Select außerhalb der Description */}
-                <div className="py-4">
+                <div className="py-4 space-y-4">
                     <Select
                         value={selectedTemplate}
                         onValueChange={setSelectedTemplate}
@@ -56,17 +58,56 @@ const TemplateResetDialog = ({
                             <SelectValue placeholder="Select template" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="bachelor">Bachelor Thesis (Default)</SelectItem>
-                            <SelectItem value="master">Master Thesis (Default)</SelectItem>
-                            {templates
-                                .filter(t => t.type === 'saved')
-                                .map(template => (
-                                    <SelectItem key={template.id} value={template.id}>
-                                        {template.name}
-                                    </SelectItem>
-                                ))}
+                            <div className="space-y-1">
+                                {/* Default templates */}
+                                {templates
+                                    .filter(isDefaultTemplate)
+                                    .map(template => (
+                                        <SelectItem 
+                                            key={template.id} 
+                                            value={template.id}
+                                            className="cursor-pointer"
+                                        >
+                                            {template.name} (v{template.version})
+                                        </SelectItem>
+                                    ))}
+                                
+                                {/* Separator if we have both types */}
+                                {templates.some(isDefaultTemplate) && 
+                                 templates.some(t => !isDefaultTemplate(t)) && (
+                                    <div className="h-px bg-gray-200 my-2" />
+                                )}
+                                
+                                {/* Custom templates */}
+                                {templates
+                                    .filter(t => !isDefaultTemplate(t))
+                                    .map(template => (
+                                        <SelectItem 
+                                            key={template.id} 
+                                            value={template.id}
+                                            className="cursor-pointer"
+                                        >
+                                            {template.name}
+                                        </SelectItem>
+                                    ))}
+                            </div>
                         </SelectContent>
                     </Select>
+
+                    {selectedTemplateInfo && (
+                        <div className="space-y-2">
+                            <p className="text-sm text-gray-600">
+                                {selectedTemplateInfo.description}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                {isDefaultTemplate(selectedTemplateInfo) ? (
+                                    `Last updated: ${format(new Date(selectedTemplateInfo.lastUpdated), 'PP')}`
+                                ) : (
+                                    `Created: ${format(new Date(selectedTemplateInfo.createdAt), 'PP')}`
+                                )}
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <AlertDialogFooter>

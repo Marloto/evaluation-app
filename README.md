@@ -1,36 +1,102 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Thesis Evaluation Tool
+
+A web-based application for evaluating academic theses using predefined text modules and weighted scoring criteria. This tool helps evaluators assess theses across four main categories: Preface, Form, Structure, and Content, ultimately providing a grade recommendation based on weighted selections.
+
+## Features
+
+- 📝 Structured evaluation across four main categories
+- 🔤 Predefined text modules for consistent evaluation
+- ⚖️ Weighted scoring system
+- 📊 Real-time grade calculation
+- 📈 Visual analytics and progress tracking
+- 💾 Save and load evaluation templates
+- 📑 Rich text notes support
+- 🖨️ Print-friendly criteria overview
+- 🎨 Clean, modern UI built with shadcn/ui
+
+## Technologies
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- TipTap
+- DnD Kit
+- Recharts
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/thesis-evaluation-tool.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+cd thesis-evaluation-tool
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Start the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Learn More
+### Building for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Select or create an evaluation template
+2. Navigate through the four main categories:
+   - Preface
+   - Form
+   - Structure
+   - Content
+3. Select appropriate criteria and ratings for each section
+4. Add custom notes and text as needed
+5. Review the automatically calculated grade recommendation
+6. Export or save your evaluation
 
-## Deploy on Vercel
+## Configuration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The tool supports custom configuration for:
+- Evaluation criteria and weights
+- Grading thresholds
+- Text modules
+- Templates
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See the `lib/config` directory for configuration files.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- GitHub Issues: https://github.com/marloto/project/issues
+- GitHub Discussions: https://github.com/marloto/project/discussions
+- Project Website: https://project.example.com

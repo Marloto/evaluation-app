@@ -66,21 +66,3 @@ export const generateFullText = (
     
     return texts;
 };
-
-/**
- * Generiert eine formatierte Version des kompletten Textes
- */
-export const generateFormattedFullText = (
-    sections: Record<string, Section>,
-    evaluationState: EvaluationState
-): string => {
-    const texts = generateFullText(sections, evaluationState);
-    
-    return Object.entries(sections)
-        .map(([sectionKey, section]) => {
-            const sectionText = texts[sectionKey];
-            return sectionText ? `${section.title}\n\n${sectionText}\n` : '';
-        })
-        .filter(text => text.length > 0)
-        .join('\n');
-};
