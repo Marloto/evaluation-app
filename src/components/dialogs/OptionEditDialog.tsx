@@ -27,7 +27,10 @@ export const OptionEditDialog: React.FC<OptionEditDialogProps> = ({
   mode,
   initialData = { text: '', score: 1 }
 }) => {
-  const memoizedInitialData = React.useMemo(() => initialData, [initialData.text, initialData.score]);
+  const memoizedInitialData = React.useMemo(() => ({
+    text: initialData.text,
+    score: initialData.score
+}), [initialData.text, initialData.score]);
   const [formData, setFormData] = React.useState(initialData);
 
   React.useEffect(() => {

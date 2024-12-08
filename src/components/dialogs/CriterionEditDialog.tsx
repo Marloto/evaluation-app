@@ -27,7 +27,11 @@ export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
   mode,
   initialData = { title: '', weight: 0.1 }
 }) => {
-  const memoizedInitialData = React.useMemo(() => initialData, [initialData.title, initialData.weight, initialData.excludeFromTotal]);
+  const memoizedInitialData = React.useMemo(() => ({
+    title: initialData.title,
+    weight: initialData.weight,
+    excludeFromTotal: initialData.excludeFromTotal
+}), [initialData.title, initialData.weight, initialData.excludeFromTotal]);
   const [formData, setFormData] = React.useState({
     title: initialData.title,
     weight: initialData.weight,

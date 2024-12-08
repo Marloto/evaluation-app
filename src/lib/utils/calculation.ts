@@ -1,4 +1,4 @@
-import { Section, Criterion } from '@/lib/types/types';
+import { Section } from '@/lib/types/types';
 
 interface CriterionState {
     score?: number;

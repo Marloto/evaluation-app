@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
 import { Settings, RotateCcw, Download, Upload } from 'lucide-react';
@@ -15,12 +15,11 @@ import { Textarea } from "@/components/ui/textarea";
 import ResetConfirmDialog from './dialogs/ResetConfirmDialog';
 import { useGrades } from './GradeProvider';
 import { calculateSectionScore } from '@/lib/utils/calculation';
-import { generateSectionText } from '@/lib/utils/text-generation';
 
 import { format } from 'date-fns';
 import { toast } from "sonner";  // shadcn verwendet sonner für Toasts
 import StarRating from './StarRating';
-import { Criterion as CriterionType, EvaluationConfig, GradeConfig, Option, Section } from '@/lib/types/types';
+import { EvaluationConfig, GradeConfig, Section } from '@/lib/types/types';
 import TemplateResetDialog from './dialogs/TemplateResetDialog';
 
 // Typ für die gespeicherte Konfiguration
@@ -70,7 +69,7 @@ const EvaluationContent = () => {
             initialPreambles[sectionKey] = sectionState.preamble || '';
         });
         setPreambleTexts(initialPreambles);
-    }, []);
+    }, [state.sections]);
 
     // Funktion zum Herunterladen der aktuellen Konfiguration
     const handleDownload = () => {

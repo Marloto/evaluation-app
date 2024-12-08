@@ -93,12 +93,12 @@ const CriteriaOverview: React.FC<CriteriaOverviewProps> = ({ sections, isOpen, o
           <div class="intro-text">
             ${introduction}
           </div>
-          ${Object.entries(sections).map(([sectionKey, section]) => `
+          ${Object.values(sections).map((section) => `
             <div class="section">
               <div class="section-title">
                 ${section.title} (${(section.weight * 100).toFixed(0)}%)
               </div>
-              ${Object.entries(section.criteria).map(([criterionKey, criterion]) => {
+              ${Object.values(section.criteria).map((criterion) => {
                 const bestOption = criterion.options.find(opt => opt.score === 5);
                 const worstOption = criterion.options.find(opt => opt.score === 1);
                 return `

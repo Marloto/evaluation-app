@@ -95,7 +95,7 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
         } catch (error) {
             console.error('Error loading evaluation state:', error);
         }
-    }, []);
+    }, [sections]);
 
     // Save state to localStorage whenever it changes
     useEffect(() => {

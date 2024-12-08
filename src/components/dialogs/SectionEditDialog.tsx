@@ -26,7 +26,10 @@ export const SectionEditDialog: React.FC<SectionEditDialogProps> = ({
   mode,
   initialData = { title: '', weight: 0.1 }
 }) => {
-  const memoizedInitialData = React.useMemo(() => initialData, [initialData.title, initialData.weight]);
+  const memoizedInitialData = React.useMemo(() => ({
+    title: initialData.title,
+    weight: initialData.weight,
+}), [initialData.title, initialData.weight]);
   const [formData, setFormData] = React.useState(initialData);
 
   React.useEffect(() => {

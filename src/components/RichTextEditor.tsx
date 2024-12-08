@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
     ImageIcon
 } from 'lucide-react';
 import { cn } from "@/lib/utils/misc";
+import { Level } from '@tiptap/extension-heading';
 
 const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -150,6 +151,16 @@ interface RichTextEditorProps {
     className?: string;
 }
 
+interface MenuBarProps {
+    editor: Editor | null;
+}
+
+interface HeadingButton {
+    level: Level;
+    icon: React.FC<{ className?: string }>;
+    title: string;
+}
+
 const RichTextEditor = ({ value, onChange, className }: RichTextEditorProps) => {
     const editor = useEditor({
         extensions: [
@@ -273,12 +284,13 @@ const RichTextEditor = ({ value, onChange, className }: RichTextEditorProps) => 
         input.click();
     }, [editor, onChange]);
 
-    const MenuBar = ({ editor }: { editor: any }) => {
+
+    const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
         if (!editor) {
             return null;
         }
-    
-        const headingButtons = [
+
+        const headingButtons: HeadingButton[] = [
             { level: 1, icon: Heading1, title: "Heading 1 (Ctrl+Alt+1)" },
             { level: 2, icon: Heading2, title: "Heading 2 (Ctrl+Alt+2)" },
             { level: 3, icon: Heading3, title: "Heading 3 (Ctrl+Alt+3)" },
