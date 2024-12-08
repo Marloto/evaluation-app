@@ -3,6 +3,8 @@ name: Docker Build and Push
 on:
   push:
     branches: [ "main" ]
+    # Add tag triggers
+    tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ "main" ]
 
@@ -33,16 +35,29 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # Enhanced tagging strategy
           tags: |
+            # Always tag with 'latest' on main branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            # Use semver tags when Git tag is pushed
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            # Tag with branch name (for feature branches)
             type=ref,event=branch
             type=ref,event=pr
-            type=semver,pattern={{version}}
+            # Include commit SHA
             type=sha,format=long
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
