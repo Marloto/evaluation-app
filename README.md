@@ -34,6 +34,7 @@ This overall project was created using Claude, an AI assistant developed by Anth
 
 The following diagram shows the main components and their relationships within this Evaluation-App.
 
+```mermaid
 graph TD
     A[MainSplitView] --> B[ConfigProvider]
     A --> C[EvaluationStateProvider]
@@ -74,6 +75,7 @@ graph TD
     U --> J
     V --> L
     V --> J
+```
 
 - Providers: The `ConfigProvider`, `EvaluationStateProvider`, and `GradeProvider` manage the application's state and configuration.
 - Main Components: The `MainSplitView` is the main entry point, which connects the various components like `ConfigurationSidebar`, `EvaluationNavigation`, `Criterion`, `OptionList`, `SectionList`, and `RichTextEditor`.
