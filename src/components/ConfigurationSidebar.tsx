@@ -1,10 +1,11 @@
-// ConfigurationSidebar.tsx
+"use client"
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Settings2, Save, FolderOpen } from "lucide-react";
 import { useConfig } from './providers/ConfigProvider';
-import { useGrades } from './GradeProvider';
+import { useGrades } from './providers/GradeProvider';
 import { cn } from "@/lib/utils/misc";
 import { SectionList } from './SectionItem';
 import GradeConfigDialog from './dialogs/GradeConfigDialog';

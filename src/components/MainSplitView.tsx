@@ -13,7 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PenSquare } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import ResetConfirmDialog from './dialogs/ResetConfirmDialog';
-import { useGrades } from './GradeProvider';
+import { useGrades } from './providers/GradeProvider';
 import { calculateSectionScore } from '@/lib/utils/calculation';
 
 import { format } from 'date-fns';

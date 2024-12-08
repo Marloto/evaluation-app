@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react';
 import {
     Dialog,
@@ -16,7 +18,7 @@ import {
 } from 'recharts';
 import { Section } from '@/lib/types/types';
 import StarRating from '../StarRating';
-import { useGrades } from '../GradeProvider';
+import { useGrades } from '../providers/GradeProvider';
 
 const GradeDisplay = ({ percentage }: { percentage: number }) => {
     const { calculateGrade } = useGrades();
