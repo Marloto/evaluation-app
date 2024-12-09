@@ -29,9 +29,8 @@ const StarRating = ({
     const totalStars = Math.floor(maxScore);
     const fullStars = Math.floor(score);
     const decimal = score % 1;
-    
+
     return Array.from({ length: totalStars }).map((_, index) => {
-      // Bestimme den Stern-Typ für diese Position
       const isFilled = index < fullStars;
       const isHalf = !isFilled && index === fullStars && decimal >= 0.25;
       const isNearlFull = !isFilled && index === fullStars && decimal >= 0.75;
@@ -45,7 +44,6 @@ const StarRating = ({
             height: `${sizeMap[size].star}px`
           }}
         >
-          {/* Base empty star */}
           {showEmpty && (
             <Star
               size={sizeMap[size].star}
@@ -53,7 +51,6 @@ const StarRating = ({
             />
           )}
           
-          {/* Filled or half star overlay */}
           {(isFilled || isHalf || isNearlFull) && (
             isHalf ? (
               <StarHalf

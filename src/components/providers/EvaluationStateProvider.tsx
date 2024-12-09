@@ -59,9 +59,17 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
     sections
 }) => {
     // Initialer State ist immer der leere Zustand
-    const [state, setState] = useState<EvaluationState>(() =>
-        createInitialState(sections)
-    );
+    const [state, setState] = useState<EvaluationState>(() => {
+        try {
+            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+        } catch (error)  {
+            console.error('Error loading state:', error);
+        }
+        return createInitialState(sections);
+    });
 
     const updateNotes = (notes: string) => {
         setState(prev => ({
@@ -69,33 +77,6 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
           notes
         }));
     };
-
-    // Lade den State aus dem localStorage erst nach dem ersten Render
-    useEffect(() => {
-        try {
-            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (stored) {
-                const parsedState = JSON.parse(stored);
-                // Validiere und aktualisiere den gespeicherten Zustand
-                const validSections = Object.keys(sections);
-                const validatedSections: Record<string, SectionState> = {};
-    
-                validSections.forEach(sectionKey => {
-                    validatedSections[sectionKey] = parsedState.sections[sectionKey] || {
-                        criteria: {}
-                    };
-                });
-    
-                setState({
-                    sections: validatedSections,
-                    activeSection: parsedState.activeSection || validSections[0] || null,
-                    notes: parsedState.notes || '' // Füge notes hinzu, mit Fallback auf leeren String
-                });
-            }
-        } catch (error) {
-            console.error('Error loading evaluation state:', error);
-        }
-    }, [sections]);
 
     // Save state to localStorage whenever it changes
     useEffect(() => {

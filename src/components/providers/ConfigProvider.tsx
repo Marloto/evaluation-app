@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { EvaluationConfig, Template } from '@/lib/types/types';
 import { 
   defaultTemplates, 
@@ -24,37 +24,52 @@ const LOCAL_STORAGE_KEY = 'thesis-evaluation-config';
 const TEMPLATES_STORAGE_KEY = 'thesis-evaluation-templates';
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
-  // Initialisiere mit dem ersten Default-Template
-  const [config, setConfig] = useState<EvaluationConfig>(defaultTemplates[0].config);
-  const [templates, setTemplates] = useState<Template[]>(defaultTemplates);
-
-  // Load saved templates on mount
-  useEffect(() => {
+  const [config, setConfig] = useState<EvaluationConfig>(() => {
     try {
-      // Load last used config if exists
-      const storedConfig = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (storedConfig) {
-        setConfig(JSON.parse(storedConfig));
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (stored) {
+        return JSON.parse(stored);
       }
-
-      // Load saved templates
+    } catch (error) {
+      console.error('Error loading initial config:', error);
+    }
+    return defaultTemplates[0].config;
+  });
+  const [templates, setTemplates] = useState<Template[]>(() => {
+    try {
       const storedTemplates = localStorage.getItem(TEMPLATES_STORAGE_KEY);
       if (storedTemplates) {
         const savedTemplates = JSON.parse(storedTemplates) as Template[];
-        // Ensure stored templates have correct type information
         const validatedTemplates = savedTemplates.filter(isSavedTemplate);
-        setTemplates([...defaultTemplates, ...validatedTemplates]);
+        return [...defaultTemplates, ...validatedTemplates];
       }
     } catch (error) {
-      console.error('Error loading configuration:', error);
-      // Fallback to default template if loading fails
-      setConfig(defaultTemplates[0].config);
+      console.error('Error loading templates:', error);
     }
-  }, []);
+
+    return defaultTemplates;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config));
+    }
+  }, [config]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(
+        TEMPLATES_STORAGE_KEY,
+        JSON.stringify(templates.filter(isSavedTemplate))
+      );
+    }
+  }, [templates]);
 
   const updateConfig = (newConfig: EvaluationConfig) => {
     try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newConfig));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newConfig));
+      }
       setConfig(newConfig);
     } catch (error) {
       console.error('Error saving config:', error);
@@ -78,11 +93,12 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
         newTemplate
       ];
       
-      // Only save custom templates to localStorage
-      localStorage.setItem(
-        TEMPLATES_STORAGE_KEY, 
-        JSON.stringify(updatedTemplates.filter(isSavedTemplate))
-      );
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          TEMPLATES_STORAGE_KEY, 
+          JSON.stringify(updatedTemplates.filter(isSavedTemplate))
+        );
+      }
       
       setTemplates(updatedTemplates);
     } catch (error) {
@@ -92,7 +108,6 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
 
   const deleteTemplate = (templateId: string) => {
     try {
-      // Prevent deletion of default templates
       const templateToDelete = templates.find(t => t.id === templateId);
       if (!templateToDelete || isDefaultTemplate(templateToDelete)) {
         console.warn('Cannot delete default template');
@@ -101,11 +116,12 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
 
       const updatedTemplates = templates.filter(t => t.id !== templateId);
       
-      // Only save custom templates to localStorage
-      localStorage.setItem(
-        TEMPLATES_STORAGE_KEY,
-        JSON.stringify(updatedTemplates.filter(isSavedTemplate))
-      );
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          TEMPLATES_STORAGE_KEY,
+          JSON.stringify(updatedTemplates.filter(isSavedTemplate))
+        );
+      }
       
       setTemplates(updatedTemplates);
     } catch (error) {
@@ -134,5 +150,3 @@ export const useConfig = () => {
   }
   return context;
 };
-
-export default ConfigProvider;

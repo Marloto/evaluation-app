@@ -1,11 +1,7 @@
-import './globals.css'
-import type { Metadata } from 'next'
-import { Toaster } from "sonner";
+"use client"
 
-export const metadata: Metadata = {
-  title: 'Thesis Evaluation',
-  description: 'Tool for evaluating thesis works',
-}
+import './globals.css'
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -14,6 +10,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>Thesis Evaluation</title>
+      </head>
       <body>
         {children}
         <Toaster />

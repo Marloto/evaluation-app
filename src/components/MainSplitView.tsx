@@ -89,27 +89,37 @@ const EvaluationContent = () => {
     const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-
+    
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const content = e.target?.result as string;
                 const savedConfig = JSON.parse(content) as SavedConfiguration;
-
-                // Validiere die Struktur der geladenen Konfiguration
+    
+                // Validierung
                 if (!savedConfig.version || 
                     !savedConfig.config || 
                     !savedConfig.evaluationState || 
                     !savedConfig.gradeConfig) {
                     throw new Error('Invalid configuration file format');
                 }
-
-                // Typsichere Updates
-                updateConfig(savedConfig.config as EvaluationConfig);
+    
+                // Zuerst Config und GradeConfig aktualisieren
+                updateConfig(savedConfig.config);
+                updateGradeConfig(savedConfig.gradeConfig);
+    
+                // Kurze Verzögerung, um sicherzustellen, dass die Config-Updates verarbeitet wurden
+                await new Promise(resolve => setTimeout(resolve, 0));
+    
+                // Dann den EvaluationState laden
                 loadState(savedConfig.evaluationState);
-                updateGradeConfig(savedConfig.gradeConfig as GradeConfig);
-
+                
                 toast.success('Configuration loaded successfully');
+    
+                // Datei-Input zurücksetzen
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
             } catch (error) {
                 console.error('Error loading configuration:', error);
                 toast.error('Error loading configuration file');

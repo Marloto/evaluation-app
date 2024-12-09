@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: process.env.BASE_PATH || ''
+  basePath: process.env.BASE_PATH || '',
+  reactStrictMode: true,  // Aktiviert strikte Prüfungen
 };
 
 export default nextConfig;
