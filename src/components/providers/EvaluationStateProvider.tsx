@@ -17,7 +17,7 @@ interface SectionState {
 export interface EvaluationState {
     sections: Record<string, SectionState>;
     activeSection: string | null;
-    notes: string; // Add this new field
+    notes: string;
 }
 
 interface EvaluationContextType {
@@ -36,6 +36,7 @@ const EvaluationContext = createContext<EvaluationContextType | undefined>(undef
 const LOCAL_STORAGE_KEY = 'thesis-evaluation-state';
 
 const createInitialState = (sections: Record<string, Section>): EvaluationState => {
+    console.log("create initial state");
     const initial: Record<string, SectionState> = {};
     Object.keys(sections).forEach(sectionKey => {
         initial[sectionKey] = {
@@ -49,6 +50,12 @@ const createInitialState = (sections: Record<string, Section>): EvaluationState 
     };
 };
 
+const createEmptyState = (): EvaluationState => ({
+    sections: {},
+    activeSection: null,
+    notes: ''
+});
+
 interface EvaluationStateProviderProps {
     children: React.ReactNode;
     sections: Record<string, Section>;
@@ -59,33 +66,43 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
     sections
 }) => {
     // Initialer State ist immer der leere Zustand
-    const [state, setState] = useState<EvaluationState>(() => {
+    const [state, setState] = useState<EvaluationState>(createEmptyState());
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    useEffect(() => {
         try {
+            if(isInitialized) {
+                return;
+            }
+            console.log("Load sections");
             const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (stored) {
-                return JSON.parse(stored);
+                setState(JSON.parse(stored));
+            } else {
+                setState(createInitialState(sections));
             }
-        } catch (error)  {
-            console.error('Error loading state:', error);
+            setIsInitialized(true);
+        } catch (error) {
+            console.error('Error during hydration:', error);
+            setState(createInitialState(sections));
+            setIsInitialized(true);
         }
-        return createInitialState(sections);
-    });
+    }, [isInitialized, sections]);
 
     const updateNotes = (notes: string) => {
         setState(prev => ({
-          ...prev,
-          notes
+            ...prev,
+            notes
         }));
     };
 
     // Save state to localStorage whenever it changes
     useEffect(() => {
-        try {
+        if (isInitialized && typeof window !== 'undefined') {
+            console.log("save state", state);
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
-        } catch (error) {
-            console.error('Error saving evaluation state:', error);
         }
-    }, [state]);
+    }, [state, isInitialized]);
 
     const updateCriterion = (
         sectionKey: string,
@@ -143,7 +160,9 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
     };
 
     const resetAll = () => {
-        setState(createInitialState(sections));
+        const newState = createInitialState(sections);
+        console.log("Reset all", newState);
+        setState(newState);
     };
 
     const loadState = (newState: EvaluationState) => {

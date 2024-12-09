@@ -23,50 +23,61 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 const LOCAL_STORAGE_KEY = 'thesis-evaluation-config';
 const TEMPLATES_STORAGE_KEY = 'thesis-evaluation-templates';
 
+const emptyConfig: EvaluationConfig = {
+  sections: {}
+};
+
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
-  const [config, setConfig] = useState<EvaluationConfig>(() => {
+  const [config, setConfig] = useState<EvaluationConfig>(emptyConfig);
+  const [templates, setTemplates] = useState<Template[]>(defaultTemplates);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
     try {
-      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+      if(isInitialized) {
+          return;
       }
-    } catch (error) {
-      console.error('Error loading initial config:', error);
-    }
-    return defaultTemplates[0].config;
-  });
-  const [templates, setTemplates] = useState<Template[]>(() => {
-    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       const storedTemplates = localStorage.getItem(TEMPLATES_STORAGE_KEY);
+      
+      if (stored) {
+        setConfig(JSON.parse(stored));
+      } else {
+        setConfig(defaultTemplates[0].config);
+      }
+
       if (storedTemplates) {
         const savedTemplates = JSON.parse(storedTemplates) as Template[];
         const validatedTemplates = savedTemplates.filter(isSavedTemplate);
-        return [...defaultTemplates, ...validatedTemplates];
+        setTemplates([...defaultTemplates, ...validatedTemplates]);
       }
-    } catch (error) {
-      console.error('Error loading templates:', error);
-    }
 
-    return defaultTemplates;
-  });
+      setIsInitialized(true);
+    } catch (error) {
+      console.error('Error during hydration:', error);
+      setConfig(defaultTemplates[0].config);
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isInitialized && typeof window !== 'undefined') {
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(config));
     }
-  }, [config]);
+  }, [config, isInitialized]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isInitialized && typeof window !== 'undefined') {
       localStorage.setItem(
         TEMPLATES_STORAGE_KEY,
         JSON.stringify(templates.filter(isSavedTemplate))
       );
     }
-  }, [templates]);
+  }, [templates, isInitialized]);
 
   const updateConfig = (newConfig: EvaluationConfig) => {
     try {
+      console.log("save config", config, typeof window !== 'undefined');
       if (typeof window !== 'undefined') {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newConfig));
       }
@@ -78,6 +89,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
 
   const loadTemplate = (templateId: string) => {
     const template = templates.find(t => t.id === templateId);
+    console.log("Load template", templateId, template);
     if (template) {
       updateConfig(template.config);
     }
