@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-ARG BASE_PATH=/
+ARG BASE_PATH=""
 
 # Copy source and build
 COPY . .
