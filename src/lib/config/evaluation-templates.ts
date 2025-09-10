@@ -8,7 +8,7 @@ export const evaluationConfig: EvaluationConfig = {
       criteria: {
         independence: {
           title: "Selbstständigkeit",
-          weight: 0.35,
+          weight: 0.3,
           options: [
             { text: "Die Arbeit zeigt wenig eigenständige wissenschaftliche Leistung", score: 1 },
             { text: "Die Arbeit zeigt teilweise eigenständige wissenschaftliche Arbeit mit häufigem Unterstützungsbedarf", score: 2 },
@@ -19,7 +19,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         methodology: {
           title: "Methodisches Vorgehen",
-          weight: 0.35,
+          weight: 0.3,
           options: [
             { text: "Das methodische Vorgehen zeigt grundlegende Mängel und geringe Systematik", score: 1 },
             { text: "Das methodische Vorgehen ist teilweise systematisch, weist aber Mängel auf", score: 2 },
@@ -30,7 +30,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         implementation: {
           title: "Umsetzung der Aufgabenstellung",
-          weight: 0.3,
+          weight: 0.4,
           options: [
             { text: "Die Aufgabenstellung wurde unzureichend umgesetzt", score: 1 },
             { text: "Die Aufgabenstellung wurde teilweise umgesetzt", score: 2 },
@@ -104,7 +104,7 @@ export const evaluationConfig: EvaluationConfig = {
     },
     structure: {
       title: "Gliederung",
-      weight: 0.2,
+      weight: 0.15,
       criteria: {
         logical_structure: {
           title: "Logischer Aufbau",
@@ -143,7 +143,7 @@ export const evaluationConfig: EvaluationConfig = {
     },
     content: {
       title: "Inhalt",
-      weight: 0.3,
+      weight: 0.35,
       criteria: {
         argumentation: {
           title: "Argumentationsverlauf",
@@ -194,11 +194,11 @@ export const evaluationConfig: EvaluationConfig = {
           weight: 0.25,
           excludeFromTotal: true,
           options: [
-            { text: "Die Arbeit zeigt grundlegendes Verständnis der Themen", score: 1 },
-            { text: "Die Arbeit zeigt teilweise vertieftes Verständnis der Themen", score: 2 },
-            { text: "Die Arbeit zeigt vertieftes Verständnis der Themen", score: 3 },
-            { text: "Die Arbeit zeigt gutes vertieftes Verständnis der Themen", score: 4 },
-            { text: "Die Arbeit zeigt sehr gutes vertieftes Verständnis der Themen", score: 5 }
+            { text: "Ergänzend anzumerken ist, dass die Arbeit komplexe Themen mit gutem Verständnis behandelt", score: 1 },
+            { text: "Ergänzend anzumerken ist, dass die Arbeit erweitertes Verständnis komplexer Zusammenhänge zeigt", score: 2 },
+            { text: "Ergänzend anzumerken ist, dass die Arbeit Verständnis beweist und über Standardanforderungen hinausgeht", score: 3 },
+            { text: "Ergänzend anzumerken ist, dass die Arbeit gutes Verständnis komplexester Themen mit spannenden eigenständigen Lösungsansätzen zeigt", score: 4 },
+            { text: "Ergänzend anzumerken ist, dass die Arbeit sehr gutes Verständnis und innovativen Umgang mit hoher Komplexität demonstriert", score: 5 }
           ]
         }
       }
