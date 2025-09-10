@@ -93,8 +93,8 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
                     )}
                     <span className="truncate max-w-[200px]">{criterion.title}</span>
                     {criterion.excludeFromTotal && (
-                        <Badge variant="secondary" className="ml-2 bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-                            <Star className="h-3 w-3 mr-1 fill-yellow-500 text-yellow-500" />
+                        <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-100">
+                            <Star className="h-3 w-3 mr-1 fill-blue-500 text-blue-500" />
                             Bonus
                         </Badge>
                     )}
@@ -126,6 +126,7 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
                     sectionKey={sectionKey}
                     criterionKey={criterionKey}
                     options={criterion.options}
+                    isBonus={criterion.excludeFromTotal}
                 />
             )}
 

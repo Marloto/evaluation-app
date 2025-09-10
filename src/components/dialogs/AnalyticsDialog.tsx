@@ -19,6 +19,7 @@ import {
 import { Section } from '@/lib/types/types';
 import StarRating from '../StarRating';
 import { useGrades } from '../providers/GradeProvider';
+import { calculateNormalizedSectionScore } from '@/lib/utils/calculation';
 
 const GradeDisplay = ({ percentage }: { percentage: number }) => {
     const { calculateGrade } = useGrades();
@@ -111,6 +112,9 @@ const SCORE_COLORS: Record<number, string> = {
     0: '#e5e7eb'  // gray-200
 };
 
+// Single blue color for all bonus criteria (since all bonus is good)
+const BONUS_COLOR = '#3b82f6'; // blue-500
+
 // Define section colors
 const SECTION_COLORS: Record<string, string> = {
     preface: '#0ea5e9',    // sky-500
@@ -144,55 +148,35 @@ const AnalyticsDialog: React.FC<AnalyticsDialogProps> = ({
     sections,
     sectionScores
 }) => {
-    // Calculate total achieved percentage
-    const calculateTotalPercentage = () => {
-        let totalAchieved = 0;
-        let totalPossible = 0;
-
-        Object.entries(sections).forEach(([sectionKey, section]) => {
-            Object.entries(section.criteria)
-                .filter(([, criterion]) => !criterion.excludeFromTotal)
-                .forEach(([criterionKey, criterion]) => {
-                    const maxScore = 5 * criterion.weight * section.weight;
-                    const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
-                    const achieved = score * criterion.weight * section.weight;
-
-                    totalAchieved += achieved;
-                    totalPossible += maxScore;
-                });
-        });
-
-        return (totalAchieved / totalPossible) * 100;
-    };
+    // Calculate total score using normalized section scores (properly handles bonus)
+    const totalNormalizedScore = Object.entries(sections).reduce((sum, [sectionKey, section]) => {
+        const normalizedScore = calculateNormalizedSectionScore(section, sectionScores[sectionKey]);
+        return sum + (normalizedScore * section.weight);
+    }, 0);
+    
+    // Calculate percentage based on normalized total score
+    const totalPercentage = (totalNormalizedScore / 5) * 100;
 
     const prepareDonutData = () => {
-        let totalAchieved = 0;
         const sectionData: { name: string; value: number; color: string }[] = [];
 
         Object.entries(sections).forEach(([sectionKey, section]) => {
-            // Calculate actual achieved score for this section
-            const achievedScore = Object.entries(section.criteria)
-                .filter(([, criterion]) => !criterion.excludeFromTotal)
-                .reduce((acc, [criterionKey, criterion]) => {
-                    const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
-                    return acc + (score * criterion.weight);
-                }, 0) * section.weight;
+            // Use normalized calculation that properly handles bonus
+            const normalizedScore = calculateNormalizedSectionScore(section, sectionScores[sectionKey]);
+            const weightedScore = normalizedScore * section.weight;
 
-            if (achievedScore > 0) {
+            if (weightedScore > 0) {
                 sectionData.push({
                     name: section.title,
-                    value: achievedScore,
-                    color: SECTION_COLORS[sectionKey] || '#64748b' // default color if not defined
+                    value: weightedScore,
+                    color: SECTION_COLORS[sectionKey] || '#64748b'
                 });
-                totalAchieved += achievedScore;
             }
         });
 
         // Add remaining (not achieved) portion if any
-        const totalPossible = Object.values(sections)
-            .reduce((acc, section) => acc + (5 * section.weight), 0);
-
-        const remaining = totalPossible - totalAchieved;
+        const maxPossible = 5; // Maximum score is 5
+        const remaining = maxPossible - totalNormalizedScore;
         if (remaining > 0) {
             sectionData.push({
                 name: 'Missed',
@@ -206,22 +190,17 @@ const AnalyticsDialog: React.FC<AnalyticsDialogProps> = ({
 
     // Prepare donut chart data
     const donutData = prepareDonutData();
-    const totalPercentage = calculateTotalPercentage();
 
     const renderSectionBar = (section: Section, sectionKey: string) => {
-        // Filter out excluded criteria
-        const relevantCriteria = Object.entries(section.criteria)
-            .filter(([, criterion]) => !criterion.excludeFromTotal);
+        // Calculate normalized display score (0-5 based on weighted contribution capped at 100%)
+        const normalizedScore = calculateNormalizedSectionScore(section, sectionScores[sectionKey]);
+        
+        // Separate regular and bonus criteria
+        const regularCriteria = Object.entries(section.criteria).filter(([, c]) => !c.excludeFromTotal);
+        const bonusCriteria = Object.entries(section.criteria).filter(([, c]) => c.excludeFromTotal);
 
-        // Calculate total weight for this section
-        const totalWeight = relevantCriteria
-            .reduce((sum, [, criterion]) => sum + criterion.weight, 0);
-
-        // Calculate total achieved percentage
-        const achievedPercentage = relevantCriteria.reduce((acc, [criterionKey, criterion]) => {
-            const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
-            return acc + ((score / 5) * (criterion.weight / totalWeight) * 100);
-        }, 0);
+        // Calculate weights for regular criteria only (base 100%)
+        const regularTotalWeight = regularCriteria.reduce((sum, [, criterion]) => sum + criterion.weight, 0);
 
         return (
             <div key={sectionKey} className="space-y-2">
@@ -229,53 +208,98 @@ const AnalyticsDialog: React.FC<AnalyticsDialogProps> = ({
                     <span>{section.title}</span>
                     <div className="flex items-center gap-2">
                         <StarRating
-                            score={achievedPercentage / 100 * (5)}
+                            score={normalizedScore}
                             size="sm"
                             showEmpty={false}
                         />
                         <span className="text-gray-500">
-                            {(achievedPercentage / 100 * (5)).toFixed(1)}
+                            {normalizedScore.toFixed(1)}
                         </span>
                     </div>
                 </div>
                 <div className="h-6 bg-gray-200 rounded-full overflow-hidden flex relative">
-                    {/* Achieved scores */}
-                    {relevantCriteria.map(([criterionKey, criterion]) => {
+                    {/* Step 1: Regular criteria - width based on actual score achieved */}
+                    {regularCriteria.map(([criterionKey, criterion]) => {
                         const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
-                        if (score === 0) return null; // Don't render if no score
+                        if (score === 0) return null;
 
-                        const width = (criterion.weight / totalWeight) * 100;
+                        // Width = (score/5) * weight_percentage  
+                        const maxWidth = regularTotalWeight > 0 ? (criterion.weight / regularTotalWeight) * 100 : 0;
+                        const actualWidth = (score / 5) * maxWidth;
+                        
                         return (
                             <div
-                                key={criterionKey}
+                                key={`regular-${criterionKey}`}
                                 className="h-full relative"
                                 style={{
-                                    width: `${width}%`,
+                                    width: `${actualWidth}%`,
                                     backgroundColor: SCORE_COLORS[score]
                                 }}
-                                title={`${criterion.title}: ${score} (Weight: ${criterion.weight})`}
+                                title={`${criterion.title}: ${score}/5 (Achieved: ${actualWidth.toFixed(1)}% of ${maxWidth.toFixed(1)}% max)`}
                             >
-                                {/* Subtle border between criteria */}
                                 <div className="absolute right-0 top-0 w-px h-full bg-white opacity-50" />
                             </div>
                         );
                     })}
 
-                    {/* Remaining (not achieved) portion */}
-                    {achievedPercentage < 100 && (
-                        <div
-                            className="h-full absolute right-0 top-0"
-                            style={{
-                                width: `${100 - achievedPercentage}%`,
-                                backgroundColor: SCORE_COLORS[0]
-                            }}
-                            title="Nicht erreichte Punkte"
-                        />
-                    )}
+                    {/* Step 2: Draw bonus criteria sequentially in remaining space */}
+                    {(() => {
+                        // Calculate how much space regular criteria actually used
+                        const regularUsedPercentage = regularCriteria.reduce((acc, [criterionKey, criterion]) => {
+                            const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
+                            const maxWidth = regularTotalWeight > 0 ? (criterion.weight / regularTotalWeight) * 100 : 0;
+                            const actualWidth = (score / 5) * maxWidth;
+                            return acc + actualWidth;
+                        }, 0);
+
+                        let availableSpace = Math.max(0, 100 - regularUsedPercentage);
+                        
+                        if (availableSpace <= 0 || bonusCriteria.length === 0) {
+                            return null; // No space for bonus or no bonus criteria
+                        }
+
+                        // Process each bonus criterion sequentially
+                        const bonusElements = [];
+                        
+                        for (const [criterionKey, criterion] of bonusCriteria) {
+                            const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
+                            if (score === 0 || availableSpace <= 0) continue;
+
+                            // Calculate max width this bonus criterion could take (bonus weight relative to regular criteria base)
+                            const maxBonusWidth = regularTotalWeight > 0 ? (criterion.weight / regularTotalWeight) * 100 : 0;
+                            // Actual width based on score: (score/5) * maxWidth
+                            const desiredWidth = (score / 5) * maxBonusWidth;
+                            
+                            // Take the minimum of desired width or remaining available space
+                            const actualBonusWidth = Math.min(desiredWidth, availableSpace);
+                            
+                            if (actualBonusWidth > 0) {
+                                bonusElements.push(
+                                    <div
+                                        key={`bonus-${criterionKey}`}
+                                        className="h-full relative"
+                                        style={{
+                                            width: `${actualBonusWidth}%`,
+                                            backgroundColor: BONUS_COLOR
+                                        }}
+                                        title={`${criterion.title} (Bonus): ${score}/5 (${actualBonusWidth.toFixed(1)}% of ${maxBonusWidth.toFixed(1)}% max)`}
+                                    >
+                                        <div className="absolute right-0 top-0 w-px h-full bg-blue-700 opacity-30" />
+                                    </div>
+                                );
+                                
+                                // Reduce available space for next bonus
+                                availableSpace -= actualBonusWidth;
+                            }
+                        }
+
+                        return bonusElements.length > 0 ? bonusElements : null;
+                    })()}
                 </div>
                 {/* Legend */}
                 <div className="text-xs text-gray-500 mt-1">
-                    {relevantCriteria
+                    {/* Regular criteria legend */}
+                    {regularCriteria
                         .filter(([criterionKey]) =>
                             (sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0) > 0
                         )
@@ -289,7 +313,29 @@ const AnalyticsDialog: React.FC<AnalyticsDialogProps> = ({
                                     />
                                     <span>
                                         {criterion.title + " "}
-                                        <span className="text-gray-300">(max. {(criterion.weight / totalWeight * 100).toFixed(1)}% | Score: {score} / 5)</span>
+                                        <span className="text-gray-300">(Weight: {(criterion.weight / regularTotalWeight * 100).toFixed(1)}% | Score: {score}/5)</span>
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    
+                    {/* Bonus criteria legend */}
+                    {bonusCriteria
+                        .filter(([criterionKey]) =>
+                            (sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0) > 0
+                        )
+                        .map(([criterionKey, criterion]) => {
+                            const score = sectionScores[sectionKey]?.criteria[criterionKey]?.score ?? 0;
+                            return (
+                                <div key={criterionKey} className="flex items-center gap-1">
+                                    <div
+                                        className="w-2 h-2 rounded-full"
+                                        style={{ backgroundColor: BONUS_COLOR }}
+                                    />
+                                    <span>
+                                        {criterion.title + " "}
+                                        <span className="text-blue-600 font-medium">(Bonus) </span>
+                                        <span className="text-gray-300">(Weight: {(criterion.weight / regularTotalWeight * 100).toFixed(1)}% | Score: {score}/5)</span>
                                     </span>
                                 </div>
                             );

@@ -14,13 +14,14 @@ import { PenSquare } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import ResetConfirmDialog from './dialogs/ResetConfirmDialog';
 import { useGrades } from './providers/GradeProvider';
-import { calculateSectionScore } from '@/lib/utils/calculation';
+import { calculateSectionProgress, calculateNormalizedSectionScore } from '@/lib/utils/calculation';
 
 import { format } from 'date-fns';
 import { toast } from "sonner";  // shadcn verwendet sonner für Toasts
 import StarRating from './StarRating';
 import { EvaluationConfig, GradeConfig, Section } from '@/lib/types/types';
 import TemplateResetDialog from './dialogs/TemplateResetDialog';
+import UnsavedChangesDialog from './dialogs/UnsavedChangesDialog';
 
 // Typ für die gespeicherte Konfiguration
 interface SavedConfiguration {
@@ -59,6 +60,8 @@ const EvaluationContent = () => {
     const [editingPreamble, setEditingPreamble] = useState<string | null>(null);
     const [preambleTexts, setPreambleTexts] = useState<Record<string, string>>({});
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+    const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+    const [pendingSectionSwitch, setPendingSectionSwitch] = useState<string | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -144,7 +147,65 @@ const EvaluationContent = () => {
         setEditingPreamble(null);
     };
 
-    // Neue Funktion zum Starten der Bearbeitung
+    // Check if there are unsaved changes in the current preamble
+    const hasUnsavedChanges = () => {
+        if (!editingPreamble) return false;
+        
+        const currentText = preambleTexts[editingPreamble] || '';
+        const savedText = state.sections[editingPreamble]?.preamble || '';
+        
+        return currentText !== savedText;
+    };
+
+    // Intercept section switching to check for unsaved changes
+    const handleSectionSelect = (sectionKey: string) => {
+        if (hasUnsavedChanges()) {
+            setPendingSectionSwitch(sectionKey);
+            setShowUnsavedDialog(true);
+        } else {
+            // Safe to switch - clear editing state and switch section
+            setEditingPreamble(null);
+            setActiveSection(sectionKey);
+        }
+    };
+
+    // Handle saving and continuing with section switch
+    const handleSaveAndContinue = () => {
+        if (editingPreamble) {
+            updatePreamble(editingPreamble, preambleTexts[editingPreamble] || '');
+        }
+        setEditingPreamble(null);
+        if (pendingSectionSwitch) {
+            setActiveSection(pendingSectionSwitch);
+        }
+        setShowUnsavedDialog(false);
+        setPendingSectionSwitch(null);
+    };
+
+    // Handle discarding changes and continuing with section switch
+    const handleDiscardAndContinue = () => {
+        // Reset the preamble text to the saved version
+        if (editingPreamble) {
+            setPreambleTexts(prev => ({
+                ...prev,
+                [editingPreamble]: state.sections[editingPreamble]?.preamble || ''
+            }));
+        }
+        setEditingPreamble(null);
+        if (pendingSectionSwitch) {
+            setActiveSection(pendingSectionSwitch);
+        }
+        setShowUnsavedDialog(false);
+        setPendingSectionSwitch(null);
+    };
+
+    // Handle canceling the section switch
+    const handleCancelSectionSwitch = () => {
+        setShowUnsavedDialog(false);
+        setPendingSectionSwitch(null);
+    };
+
+    // Simple function to start editing a preamble (no section switching logic here)
     const startEditing = (sectionKey: string) => {
         // Initialisiere den Text mit dem bestehenden Preamble oder leerem String
         setPreambleTexts(prev => ({
@@ -169,8 +230,10 @@ const EvaluationContent = () => {
 
     const renderSection = (sectionKey: string, section: Section) => {
         // Calculate section statistics once
-        const { score: sectionScore, validCriteria, totalCriteria } = 
-            calculateSectionScore(section, state.sections[sectionKey]);
+        const { completedCriteria, totalRequiredCriteria } = calculateSectionProgress(section, state.sections[sectionKey]);
+        
+        // Calculate normalized display score (0-5 based on weighted contribution capped at 100%)
+        const normalizedScore = calculateNormalizedSectionScore(section, state.sections[sectionKey]);
         
         return (
             <div key={sectionKey} className="border-t p-4">
@@ -178,11 +241,11 @@ const EvaluationContent = () => {
                     <div className="space-y-1">
                         <h3 className="text-lg font-semibold">{section.title}</h3>
                         <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <span>Progress: {validCriteria}/{totalCriteria}</span>
+                            <span>Progress: {completedCriteria}/{totalRequiredCriteria}</span>
                             <span>|</span>
                             <span>
                                 <StarRating
-                                    score={sectionScore}
+                                    score={normalizedScore}
                                     size="sm"
                                     showEmpty={true}
                                 />
@@ -235,6 +298,7 @@ const EvaluationContent = () => {
                         options={criterion.options}
                         value={state.sections[sectionKey]?.criteria[criterionKey]?.score}
                         customText={state.sections[sectionKey]?.criteria[criterionKey]?.customText}
+                        excludeFromTotal={criterion.excludeFromTotal}
                         onUpdate={(update) => handleCriterionUpdate(sectionKey, criterionKey, update)}
                     />
                 ))}
@@ -250,7 +314,7 @@ const EvaluationContent = () => {
                         <EvaluationNavigation
                             sections={config.sections}
                             activeSection={state.activeSection}
-                            onSectionSelect={setActiveSection}
+                            onSectionSelect={handleSectionSelect}
                             evaluationState={state}
                         />
                     </div>
@@ -333,6 +397,14 @@ const EvaluationContent = () => {
                 onClose={() => setIsResetDialogOpen(false)}
                 onConfirm={handleTemplateLoad}
                 templates={templates}
+            />
+
+            <UnsavedChangesDialog
+                isOpen={showUnsavedDialog}
+                onClose={handleCancelSectionSwitch}
+                onSaveAndContinue={handleSaveAndContinue}
+                onDiscardAndContinue={handleDiscardAndContinue}
+                sectionTitle={editingPreamble ? config.sections[editingPreamble]?.title : undefined}
             />
         </div>
     );

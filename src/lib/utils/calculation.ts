@@ -16,103 +16,126 @@ export interface EvaluationState {
 }
 
 /**
- * Berechnet die normalisierte Bewertung für eine einzelne Sektion
+ * Berechnet den Fortschritt für eine einzelne Sektion (nur für Progress-Anzeige)
  */
-export const calculateSectionScore = (
+export const calculateSectionProgress = (
     section: Section,
     sectionState: SectionState | undefined
 ): { 
-    score: number; 
-    validCriteria: number; 
-    totalCriteria: number;
-    optionalCriteria: number;
+    completedCriteria: number;
+    totalRequiredCriteria: number;
+    completedBonusCriteria: number;
 } => {
-    let weightedSum = 0;
-    let totalWeight = 0;
-    let validCriteria = 0;
-    let optionalCriteria = 0;
+    // Safety check
+    if (!sectionState || !sectionState.criteria) {
+        return {
+            completedCriteria: 0,
+            totalRequiredCriteria: Object.values(section.criteria).filter(c => !c.excludeFromTotal).length,
+            completedBonusCriteria: 0
+        };
+    }
+
+    let completedCriteria = 0;
+    let completedBonusCriteria = 0;
     
     // Zähle nur nicht-optionale Kriterien für die Pflicht-Gesamtzahl
-    const totalCriteria = Object.values(section.criteria)
+    const totalRequiredCriteria = Object.values(section.criteria)
         .filter(c => !c.excludeFromTotal).length;
 
-    // Berechne gewichtete Summe für alle ausgewählten Kriterien
+    // Zähle completed Kriterien
     Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
-        const score = sectionState?.criteria[criterionKey]?.score;
-        if (score === undefined) return;
-
-        // Zähle ausgewählte Kriterien
-        if (criterion.excludeFromTotal) {
-            optionalCriteria++;
-        } else {
-            validCriteria++;
+        const score = sectionState.criteria[criterionKey]?.score;
+        if (score !== undefined) {
+            if (criterion.excludeFromTotal) {
+                completedBonusCriteria++;
+            } else {
+                completedCriteria++;
+            }
         }
-
-        // Fließt in jedem Fall in die Gesamtberechnung ein
-        weightedSum += score * criterion.weight;
-        totalWeight += criterion.weight;
     });
 
-    // Normalisiere das Ergebnis
-    const normalizedScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
-
     return {
-        score: Number(normalizedScore.toFixed(2)),
-        validCriteria,
-        totalCriteria,
-        optionalCriteria
+        completedCriteria,
+        totalRequiredCriteria,
+        completedBonusCriteria
     };
 };
 
 /**
- * Berechnet die normalisierte Gesamtbewertung über alle Sektionen
+ * Berechnet den Gesamtfortschritt über alle Sektionen (nur für Progress-Anzeige)
  */
-export const calculateTotalScore = (
+export const calculateTotalProgress = (
     sections: Record<string, Section>,
     evaluationState: EvaluationState
 ): { 
-    score: number; 
+    completedCriteria: number;
+    totalRequiredCriteria: number;
+    completedBonusCriteria: number;
     percentage: number;
-    validCriteria: number;
-    totalCriteria: number;
-    optionalCriteria: number;
 } => {
-    let weightedSum = 0;
-    let totalWeight = 0;
-    let allValidCriteria = 0;
-    let allTotalCriteria = 0;
-    let allOptionalCriteria = 0;
+    let allCompletedCriteria = 0;
+    let allTotalRequiredCriteria = 0;
+    let allCompletedBonusCriteria = 0;
 
-    // Berechne gewichtete Summe und Gesamtgewicht über alle Sektionen
+    // Summiere über alle Sektionen
     Object.entries(sections).forEach(([sectionKey, section]) => {
         const sectionState = evaluationState.sections[sectionKey];
         const { 
-            score, 
-            validCriteria, 
-            totalCriteria,
-            optionalCriteria
-        } = calculateSectionScore(section, sectionState);
+            completedCriteria, 
+            totalRequiredCriteria,
+            completedBonusCriteria
+        } = calculateSectionProgress(section, sectionState);
         
-        weightedSum += score * section.weight;
-        totalWeight += section.weight;
-        allValidCriteria += validCriteria;
-        allTotalCriteria += totalCriteria;
-        allOptionalCriteria += optionalCriteria;
+        allCompletedCriteria += completedCriteria;
+        allTotalRequiredCriteria += totalRequiredCriteria;
+        allCompletedBonusCriteria += completedBonusCriteria;
     });
 
-    // Normalisiere das Gesamtergebnis
-    const normalizedScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
-    
-    // Berechne den Prozentsatz (basierend auf Max-Score 5.0)
-    const percentage = (normalizedScore / 5) * 100;
+    // Berechne Prozentsatz
+    const percentage = allTotalRequiredCriteria > 0 
+        ? (allCompletedCriteria / allTotalRequiredCriteria) * 100 
+        : 0;
 
     return {
-        score: Number(normalizedScore.toFixed(1)),
-        percentage: Number(percentage.toFixed(1)),
-        validCriteria: allValidCriteria,
-        totalCriteria: allTotalCriteria,
-        optionalCriteria: allOptionalCriteria
+        completedCriteria: allCompletedCriteria,
+        totalRequiredCriteria: allTotalRequiredCriteria,
+        completedBonusCriteria: allCompletedBonusCriteria,
+        percentage: Number(percentage.toFixed(1))
     };
+};
+
+
+/**
+ * Berechnet den normalisierten Anzeigewert für eine Sektion (0-5 basierend auf gewichteter Beitragsleistung begrenzt auf 100%)
+ * Dies stellt dar, wie viel die Sektion zur Endnote beiträgt, wobei Bonus-Punkte die Anzeige auf 5.0 begrenzen können.
+ */
+export const calculateNormalizedSectionScore = (
+    section: Section,
+    sectionState: SectionState | undefined
+): number => {
+    if (!sectionState?.criteria) {
+        return 0;
+    }
+    
+    let regularWeightedSum = 0;
+    let regularTotalWeight = 0;
+    let bonusWeightedSum = 0;
+    
+    Object.entries(section.criteria).forEach(([criterionKey, criterion]) => {
+        const score = sectionState.criteria[criterionKey]?.score;
+        if (score === undefined) return;
+        
+        if (criterion.excludeFromTotal) {
+            bonusWeightedSum += score * criterion.weight;
+        } else {
+            regularWeightedSum += score * criterion.weight;
+            regularTotalWeight += criterion.weight;
+        }
+    });
+    
+    // Cap total weighted sum at 100% (regularTotalWeight * 5) and normalize to 5
+    const cappedWeightedSum = Math.min(regularTotalWeight * 5, regularWeightedSum + bonusWeightedSum);
+    return regularTotalWeight > 0 ? (cappedWeightedSum / regularTotalWeight) : 0;
 };
 
 /**

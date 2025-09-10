@@ -27,11 +27,13 @@ import StarRating from './StarRating';
 interface SortableOptionProps {
     option: Option;
     onEdit: () => void;
+    isBonus?: boolean;
 }
 
 const SortableOption: React.FC<SortableOptionProps> = ({
     option,
-    onEdit
+    onEdit,
+    isBonus = false
 }) => {
     const {
         attributes,
@@ -67,6 +69,7 @@ const SortableOption: React.FC<SortableOptionProps> = ({
                         score={option.score}
                         size="sm"
                         showEmpty={true}
+                        color={isBonus ? 'blue' : 'green'}
                     />
                     ({option.score})
                 </div>
@@ -86,12 +89,14 @@ interface OptionListProps {
     sectionKey: string;
     criterionKey: string;
     options: Option[];
+    isBonus?: boolean;
 }
 
 export const OptionList: React.FC<OptionListProps> = ({
     sectionKey,
     criterionKey,
     options,
+    isBonus = false,
 }) => {
     const configManager = useConfigurationManager();
     const [dialogState, setDialogState] = useState<{
@@ -191,6 +196,7 @@ export const OptionList: React.FC<OptionListProps> = ({
                                 key={`${option.score}-${option.text}`}
                                 option={option}
                                 onEdit={() => handleEdit(index)}
+                                isBonus={isBonus}
                             />
                         ))}
                     </SortableContext>

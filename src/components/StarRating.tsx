@@ -9,6 +9,7 @@ interface StarRatingProps {
   size?: 'sm' | 'md' | 'lg';
   showEmpty?: boolean;
   className?: string;
+  color?: 'green' | 'blue';
 }
 
 const StarRating = ({ 
@@ -16,13 +17,20 @@ const StarRating = ({
   maxScore = 5, 
   size = 'md', 
   showEmpty = true,
-  className = '' 
+  className = '',
+  color = 'green'
 }: StarRatingProps) => {
   // Map size to actual dimensions
   const sizeMap = {
     sm: { star: 14, container: 'h-4' },
     md: { star: 18, container: 'h-5' },
     lg: { star: 22, container: 'h-6' }
+  };
+
+  // Map color to CSS classes
+  const colorMap = {
+    green: 'fill-green-700 text-green-700',
+    blue: 'fill-blue-500 text-blue-500'
   };
 
   const renderStars = () => {
@@ -55,12 +63,12 @@ const StarRating = ({
             isHalf ? (
               <StarHalf
                 size={sizeMap[size].star}
-                className="absolute top-0 left-0 fill-green-700 text-green-700"
+                className={`absolute top-0 left-0 ${colorMap[color]}`}
               />
             ) : (
               <Star
                 size={sizeMap[size].star}
-                className="absolute top-0 left-0 fill-green-700 text-green-700"
+                className={`absolute top-0 left-0 ${colorMap[color]}`}
               />
             )
           )}

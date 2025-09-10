@@ -24,7 +24,7 @@ import {
 import { Section } from '@/lib/types/types';
 import AnalyticsDialog from './dialogs/AnalyticsDialog';
 import StarRating from './StarRating';
-import { calculateSectionScore, calculateTotalScore } from '@/lib/utils/calculation';
+import { calculateSectionProgress, calculateTotalProgress, calculateNormalizedSectionScore } from '@/lib/utils/calculation';
 import { generateFullText } from '@/lib/utils/text-generation';
 import CriteriaOverview from './dialogs/CriteriaOverview';
 import NotesDialog from './dialogs/NotesDialog';
@@ -61,9 +61,16 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
   const [showCriteriaOverview, setShowCriteriaOverview] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
 
-  // Calculate total score
-  const { score, percentage, validCriteria, totalCriteria } = useMemo(() =>
-    calculateTotalScore(sections, evaluationState),
+  // Calculate total score using normalized section scores (properly handles bonus)
+  const score = useMemo(() => {
+    return Object.entries(sections).reduce((sum, [sectionKey, section]) => {
+      const normalizedScore = calculateNormalizedSectionScore(section, evaluationState.sections[sectionKey]);
+      return sum + (normalizedScore * section.weight);
+    }, 0);
+  }, [sections, evaluationState]);
+  
+  const { completedCriteria, totalRequiredCriteria, percentage } = useMemo(() =>
+    calculateTotalProgress(sections, evaluationState),
     [sections, evaluationState]
   );
 
@@ -117,7 +124,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
           </div>
           <div className="mt-1 text-sm text-gray-500 flex justify-between">
             <span>{percentage}% Complete</span>
-            <span>{validCriteria}/{totalCriteria} Criteria</span>
+            <span>{completedCriteria}/{totalRequiredCriteria} Criteria</span>
           </div>
         </div>
 
@@ -125,9 +132,13 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         <ScrollArea className="h-[calc(100vh-480px)]">
           <div className="space-y-2">
             {Object.entries(sections).map(([sectionKey, section]) => {
-              const { score: sectionScore, validCriteria: sectionValidCriteria, totalCriteria: sectionTotalCriteria } =
-                calculateSectionScore(section, evaluationState.sections[sectionKey]);
-              const isComplete = sectionValidCriteria === sectionTotalCriteria;
+              const { completedCriteria: sectionCompletedCriteria, totalRequiredCriteria: sectionTotalCriteria } = 
+                calculateSectionProgress(section, evaluationState.sections[sectionKey]);
+              
+              // Calculate normalized display score (0-5 based on weighted contribution capped at 100%)
+              const normalizedScore = calculateNormalizedSectionScore(section, evaluationState.sections[sectionKey]);
+              
+              const isComplete = sectionCompletedCriteria === sectionTotalCriteria;
               const isActive = activeSection === sectionKey;
 
               return (
@@ -160,12 +171,12 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
 
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-500">
-                      {sectionScore > 0 &&
-                        `${sectionScore}`
+                      {normalizedScore > 0 &&
+                        `${normalizedScore.toFixed(1)}`
                       }
                     </span>
                     <span className="text-xs text-gray-400">
-                      {sectionValidCriteria}/{sectionTotalCriteria}
+                      {sectionCompletedCriteria}/{sectionTotalCriteria}
                     </span>
                     <ChevronRight className={cn(
                       "h-4 w-4 transition-transform",
@@ -181,7 +192,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
                         isComplete ? "bg-green-500" : "bg-blue-500"
                       )}
                       style={{
-                        width: `${(sectionValidCriteria / sectionTotalCriteria) * 100}%`
+                        width: `${(sectionCompletedCriteria / sectionTotalCriteria) * 100}%`
                       }}
                     />
                   </div>
