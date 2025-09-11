@@ -40,9 +40,9 @@ const Criterion = ({
     const option = options.find(opt => opt.score === score);
     onUpdate({
       score,
-      customText: option?.text || ''
+      customText: customText || option?.text || ''
     });
-    setTempCustomText(option?.text || '');
+    setTempCustomText(customText || option?.text || '');
   };
 
   const handleUnselect = () => {
