@@ -38,11 +38,16 @@ const Criterion = ({
 
   const handleOptionSelect = (score: number) => {
     const option = options.find(opt => opt.score === score);
+    
+    // Check if current customText is just the default text from the currently selected option
+    const isCurrentTextDefault = selectedOption && customText === selectedOption.text;
+    
     onUpdate({
       score,
-      customText: customText || option?.text || ''
+      // Only preserve customText if it's different from the current option's default text
+      customText: isCurrentTextDefault ? (option?.text || '') : (customText || option?.text || '')
     });
-    setTempCustomText(customText || option?.text || '');
+    setTempCustomText(isCurrentTextDefault ? (option?.text || '') : (customText || option?.text || ''));
   };
 
   const handleUnselect = () => {
