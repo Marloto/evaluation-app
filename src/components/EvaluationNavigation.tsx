@@ -15,12 +15,6 @@ import {
   StickyNote
 } from 'lucide-react';
 import { cn } from "@/lib/utils/misc";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Section } from '@/lib/types/types';
 import AnalyticsDialog from './dialogs/AnalyticsDialog';
 import StarRating from './StarRating';

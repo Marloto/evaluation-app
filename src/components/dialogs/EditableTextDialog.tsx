@@ -190,7 +190,7 @@ const EditableTextDialog: React.FC<EditableTextDialogProps> = ({
               <li>• <span className="text-blue-600">Blue dashed borders</span> = Section preambles</li>
               <li>• <span className="text-green-600">Green dashed borders</span> = Individual criterion texts</li>
               <li>• Click any text to edit directly with spell check</li>
-              <li>• Other text dims when you're editing to show focus</li>
+              <li>• Other text dims when you&apos;re editing to show focus</li>
               <li>• Changes save automatically when you click away</li>
             </ul>
           </div>
