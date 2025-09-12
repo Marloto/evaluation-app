@@ -25,9 +25,9 @@ import { Section } from '@/lib/types/types';
 import AnalyticsDialog from './dialogs/AnalyticsDialog';
 import StarRating from './StarRating';
 import { calculateSectionProgress, calculateTotalProgress, calculateNormalizedSectionScore } from '@/lib/utils/calculation';
-import { generateFullText } from '@/lib/utils/text-generation';
 import CriteriaOverview from './dialogs/CriteriaOverview';
 import NotesDialog from './dialogs/NotesDialog';
+import EditableTextDialog from './dialogs/EditableTextDialog';
 
 
 interface NavigationProps {
@@ -56,7 +56,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
   activeSection,
   onSectionSelect,
 }) => {
-  const [showFullText, setShowFullText] = useState(false);
+  const [showCompleteText, setShowCompleteText] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showCriteriaOverview, setShowCriteriaOverview] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
@@ -74,11 +74,6 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
     [sections, evaluationState]
   );
 
-  // Generate texts when needed (only when dialog is open)
-  const generatedTexts = useMemo(() =>
-    showFullText ? generateFullText(sections, evaluationState) : {},
-    [sections, evaluationState, showFullText]
-  );
 
   return (
     <div className="space-y-4">
@@ -208,10 +203,10 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         <Button
           className="w-full"
           variant="outline"
-          onClick={() => setShowFullText(true)}
+          onClick={() => setShowCompleteText(true)}
         >
           <FileText className="h-4 w-4 mr-2" />
-          View Complete Text
+          Complete Text
         </Button>
 
         <Button
@@ -233,24 +228,6 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         </Button>
       </div>
 
-      {/* Complete Text Dialog */}
-      <Dialog open={showFullText} onOpenChange={setShowFullText}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle>Complete Evaluation Text</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {Object.entries(sections).map(([sectionKey, section]) => (
-              <div key={sectionKey} className="space-y-2">
-                <h3>{section.title}</h3>
-                <p className="text-gray-700">
-                  {generatedTexts[sectionKey] || "No criteria selected yet."}
-                </p>
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Analytics Dialog */}
       <AnalyticsDialog
@@ -269,6 +246,14 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
       <NotesDialog
           isOpen={showNotes}
           onClose={() => setShowNotes(false)}
+      />
+
+      {/* Complete Text Dialog with View/Edit modes */}
+      <EditableTextDialog
+        isOpen={showCompleteText}
+        onClose={() => setShowCompleteText(false)}
+        sections={sections}
+        evaluationState={evaluationState}
       />
     </div>
   );
