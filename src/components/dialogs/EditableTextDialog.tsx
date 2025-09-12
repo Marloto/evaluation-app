@@ -83,7 +83,7 @@ const EditableTextDialog: React.FC<EditableTextDialogProps> = ({
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? "Edit Complete Text - Click any text to edit" : "Complete Evaluation Text"}
+            {isEditMode ? "Edit Complete Text" : "Complete Evaluation Text"}
           </DialogTitle>
         </DialogHeader>
 
@@ -107,6 +107,20 @@ const EditableTextDialog: React.FC<EditableTextDialogProps> = ({
             )}
           </Button>
         </div>
+
+        {isEditMode && (
+          <div className="px-6">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <h4 className="font-medium text-sm mb-2">Edit Mode - Usage Tips:</h4>
+              <ul className="text-xs text-gray-600 space-y-1">
+                <li>• <span className="text-blue-600">Blue dashed borders</span> = Section preambles</li>
+                <li>• <span className="text-green-600">Green dashed borders</span> = Individual criterion texts</li>
+                <li>• Click any text to edit directly with spell check</li>
+                <li>• Changes save automatically when you click away</li>
+              </ul>
+            </div>
+          </div>
+        )}
         
         <div className="space-y-6 p-4">
           {editableData.map((sectionData: EditableSectionData) => (
@@ -182,19 +196,6 @@ const EditableTextDialog: React.FC<EditableTextDialogProps> = ({
             </div>
           ))}
         </div>
-
-        {isEditMode && (
-          <div className="p-4 bg-gray-50 rounded-lg mt-6">
-            <h4 className="font-medium text-sm mb-2">Edit Mode - Usage Tips:</h4>
-            <ul className="text-xs text-gray-600 space-y-1">
-              <li>• <span className="text-blue-600">Blue dashed borders</span> = Section preambles</li>
-              <li>• <span className="text-green-600">Green dashed borders</span> = Individual criterion texts</li>
-              <li>• Click any text to edit directly with spell check</li>
-              <li>• Other text dims when you&apos;re editing to show focus</li>
-              <li>• Changes save automatically when you click away</li>
-            </ul>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
