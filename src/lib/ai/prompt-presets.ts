@@ -85,7 +85,7 @@ Allgemeine Regeln:
 - Verwende ausschließlich Fakten aus den Notizen. Erfinde keine Titel, Kapitel, Zahlen, Methoden oder Werkzeuge.
 - Titel und Abstract dienen nur der Einordnung. Sie sind Selbstauskunft der Arbeit und keine Belege für die Bewertung - Belege stammen ausschließlich aus den Notizen.
 - Wissenschaftlicher Gutachtenstil: sachlich, dritte Person, keine direkte Anrede, keine Aufzählungszeichen, kein Markdown.
-- Die Varianten sollen sich unterscheiden: unterschiedlicher Detailgrad oder unterschiedlicher Fokus auf die Belege - nicht nur andere Synonyme.
+- Die Varianten müssen sich substanziell unterscheiden - andere Synonyme allein genügen nicht.
 
 Die beiden Textarten werden unterschiedlich behandelt:
 
@@ -93,13 +93,17 @@ Die beiden Textarten werden unterschiedlich behandelt:
 - Die Bewertungsstufe darf nicht verändert werden. Der Tenor der vorgegebenen Formulierung bleibt exakt erhalten - weder aufwerten noch abwerten.
 - Enthalten die Notizen nichts Passendes zu einem Kriterium, formuliere die Vorlage nur sprachlich um und lasse sie inhaltlich unverändert.
 - Jede Formulierung bezieht sich ausschließlich auf ihr eigenes Kriterium.
-- Fließtext, in der Regel ein bis drei Sätze.
+- Die Varianten unterscheiden sich in der Länge. Gib sie von der kürzesten zur längsten aus:
+  - kürzeste Variante: die vorgegebene Formulierung, ergänzt um einen Nebensatz mit dem wichtigsten Beleg aus den Notizen. Ein Satz.
+  - mittlere Variante: etwa zwei Sätze mit dem zentralen Beleg und seiner Einordnung.
+  - längste Variante: drei bis vier Sätze, die mehrere Belege aufgreifen.
+- Werden mehr als drei Varianten verlangt, fülle die Abstufungen zwischen diesen Ankern auf; werden weniger verlangt, beginne bei der kürzesten.
 
 2. Einleitende Absätze (Preamble) fassen einen ganzen Bewertungsbereich zusammen.
 - Es gibt keine vorgegebene Formulierung und keine eigene Bewertungsstufe. Die Einleitung ordnet den Bereich ein, statt einzelne Kriterien nachzubewerten oder aufzuzählen.
 - Der inhaltliche Fokus ergibt sich aus der Bereichsbeschreibung des Bewertungsbereichs.
 - Die Einleitung nimmt die Kriterienformulierungen weder vorweg noch wiederholt sie diese.
-- Zwei bis vier Sätze.
+- Zwei bis vier Sätze. Hier unterscheiden sich die Varianten im Fokus und in der Gewichtung, nicht in der Länge.
 {{#if extraInstructions}}
 Zusätzliche Vorgaben der Nutzerin oder des Nutzers:
 {{extraInstructions}}
@@ -198,7 +202,7 @@ General rules:
 - Use facts from the notes only. Never invent titles, chapters, numbers, methods or tools.
 - Title and abstract are for orientation only. They are the thesis's own claims, not evidence for the assessment - evidence comes from the notes alone.
 - Academic report style: factual, third person, no direct address, no bullet points, no markdown.
-- The variants must differ from each other: different level of detail or a different focus on the evidence - not just synonyms.
+- The variants must differ substantially from each other - different synonyms alone are not enough.
 
 The two kinds of text are handled differently:
 
@@ -206,13 +210,17 @@ The two kinds of text are handled differently:
 - The rating level must not change. The tenor of the given wording is preserved exactly - neither upgrade nor downgrade it.
 - If the notes contain nothing relevant to a criterion, only rephrase the template and leave its content unchanged.
 - Each formulation refers to its own criterion only.
-- Continuous prose, usually one to three sentences.
+- The variants differ in length. Return them from shortest to longest:
+  - shortest variant: the given wording extended by a subordinate clause carrying the most important piece of evidence from the notes. One sentence.
+  - middle variant: about two sentences, with the central piece of evidence and how it is to be read.
+  - longest variant: three to four sentences that pick up several pieces of evidence.
+- If more than three variants are requested, fill in the gradations between these anchors; if fewer are requested, start with the shortest.
 
 2. Introductory paragraphs (preamble) summarise a whole evaluation area.
 - There is no given wording and no rating level of their own. The intro places the area in context rather than re-rating or listing the individual criteria.
 - Its focus follows from the area description of the evaluation area.
 - The intro neither anticipates nor repeats the criterion formulations.
-- Two to four sentences.
+- Two to four sentences. Here the variants differ in focus and emphasis, not in length.
 {{#if extraInstructions}}
 Additional instructions from the user:
 {{extraInstructions}}
