@@ -14,11 +14,20 @@ interface SectionState {
     criteria: Record<string, CriterionState>;
 }
 
+/** General information about the thesis under review. */
+export interface ThesisInfo {
+    title: string;
+    abstract: string;
+}
+
 export interface EvaluationState {
     sections: Record<string, SectionState>;
     activeSection: string | null;
     notes: string;
+    thesisInfo?: ThesisInfo;
 }
+
+export const EMPTY_THESIS_INFO: ThesisInfo = { title: '', abstract: '' };
 
 interface EvaluationContextType {
     state: EvaluationState;
@@ -29,6 +38,7 @@ interface EvaluationContextType {
     resetAll: () => void;
     loadState: (newState: EvaluationState) => void; // Neue Funktion
     updateNotes: (notes: string) => void; // Add this new function
+    updateThesisInfo: (patch: Partial<ThesisInfo>) => void;
 }
 
 const EvaluationContext = createContext<EvaluationContextType | undefined>(undefined);
@@ -46,14 +56,16 @@ const createInitialState = (sections: Record<string, Section>): EvaluationState 
     return {
         sections: initial,
         activeSection: Object.keys(sections)[0] || null,
-        notes: ''
+        notes: '',
+        thesisInfo: { ...EMPTY_THESIS_INFO }
     };
 };
 
 const createEmptyState = (): EvaluationState => ({
     sections: {},
     activeSection: null,
-    notes: ''
+    notes: '',
+    thesisInfo: { ...EMPTY_THESIS_INFO }
 });
 
 interface EvaluationStateProviderProps {
@@ -93,6 +105,18 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
         setState(prev => ({
             ...prev,
             notes
+        }));
+    };
+
+    // States saved before this field existed simply have no thesisInfo yet.
+    const updateThesisInfo = (patch: Partial<ThesisInfo>) => {
+        setState(prev => ({
+            ...prev,
+            thesisInfo: {
+                ...EMPTY_THESIS_INFO,
+                ...prev.thesisInfo,
+                ...patch
+            }
         }));
     };
 
@@ -179,7 +203,8 @@ export const EvaluationStateProvider: React.FC<EvaluationStateProviderProps> = (
                 resetSection,
                 resetAll,
                 loadState,
-                updateNotes
+                updateNotes,
+                updateThesisInfo
             }}
         >
             {children}

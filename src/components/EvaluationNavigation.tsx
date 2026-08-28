@@ -12,7 +12,8 @@ import {
   FileText,
   BarChart2,
   ClipboardList,
-  StickyNote
+  StickyNote,
+  Info
 } from 'lucide-react';
 import { cn } from "@/lib/utils/misc";
 import { Section } from '@/lib/types/types';
@@ -21,6 +22,7 @@ import StarRating from './StarRating';
 import { calculateSectionProgress, calculateTotalProgress, calculateNormalizedSectionScore } from '@/lib/utils/calculation';
 import CriteriaOverview from './dialogs/CriteriaOverview';
 import NotesDialog from './dialogs/NotesDialog';
+import ThesisInfoDialog from './dialogs/ThesisInfoDialog';
 import EditableTextDialog from './dialogs/EditableTextDialog';
 
 
@@ -54,6 +56,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showCriteriaOverview, setShowCriteriaOverview] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [showThesisInfo, setShowThesisInfo] = useState(false);
 
   // Calculate total score using normalized section scores (properly handles bonus)
   const score = useMemo(() => {
@@ -70,9 +73,11 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
 
 
   return (
-    <div className="space-y-4">
+    // Fixed to the viewport so the section list - not the page - takes the
+    // scrollbar when the fixed blocks around it grow.
+    <div className="flex flex-col gap-4 h-[calc(100vh-2rem)]">
       {/* Final Grade Card */}
-      <Card className="p-4 bg-green-50">
+      <Card className="p-4 bg-green-50 shrink-0">
         <div className="text-center">
           <h3 className="font-medium text-green-800">Current Rating</h3>
           <div className="text-3xl font-bold text-green-700 mt-1 flex justify-center">
@@ -85,8 +90,16 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         </div>
       </Card>
 
-      {/* Notes Section */}
-      <div className="space-y-2">
+      {/* General information and notes */}
+      <div className="space-y-2 shrink-0">
+        <Button
+            className="w-full"
+            variant="outline"
+            onClick={() => setShowThesisInfo(true)}
+        >
+            <Info className="h-4 w-4 mr-2" />
+            General Information
+        </Button>
         <Button
             className="w-full"
             variant="outline"
@@ -98,9 +111,9 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
       </div>
 
       {/* Progress and Sections */}
-      <Card className="p-4">
+      <Card className="p-4 flex-1 min-h-0 flex flex-col">
         {/* Overall Progress */}
-        <div className="mb-4">
+        <div className="mb-4 shrink-0">
           <h3 className="font-medium mb-2">Overall Progress</h3>
           <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden">
             <div
@@ -118,7 +131,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         </div>
 
         {/* Sections Navigation */}
-        <ScrollArea className="h-[calc(100vh-480px)]">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="space-y-2">
             {Object.entries(sections).map(([sectionKey, section]) => {
               const { completedCriteria: sectionCompletedCriteria, totalRequiredCriteria: sectionTotalCriteria } = 
@@ -193,7 +206,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
       </Card>
 
       {/* Action Buttons */}
-      <div className="space-y-2">
+      <div className="space-y-2 shrink-0">
         <Button
           className="w-full"
           variant="outline"
@@ -235,6 +248,11 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
         sections={sections}
         isOpen={showCriteriaOverview}
         onClose={() => setShowCriteriaOverview(false)}
+      />
+
+      <ThesisInfoDialog
+          isOpen={showThesisInfo}
+          onClose={() => setShowThesisInfo(false)}
       />
 
       <NotesDialog

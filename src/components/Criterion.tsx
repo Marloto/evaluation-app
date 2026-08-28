@@ -8,6 +8,7 @@ import { ChevronDown, ChevronRight, PenSquare, RotateCcw, Check, Star } from 'lu
 import { Option } from '@/lib/types/types'
 import StarRating from './StarRating';
 import { Badge } from "@/components/ui/badge";
+import AiButton from './AiButton';
 
 interface CriterionProps {
   title: string;
@@ -15,6 +16,8 @@ interface CriterionProps {
   value?: number;
   customText?: string;
   excludeFromTotal?: boolean;
+  /** Opens the AI proposal dialog for this criterion. Omitted = no AI entry point. */
+  onAiGenerate?: () => void;
   onUpdate: (update: {
     score?: number;
     customText?: string;
@@ -27,6 +30,7 @@ const Criterion = ({
   value,
   customText,
   excludeFromTotal = false,
+  onAiGenerate,
   onUpdate
 }: CriterionProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -118,20 +122,27 @@ const Criterion = ({
             {/* Selected Option Preview */}
             {hasValue && !isEditing && (
               <div className="relative group">
-                <div className="p-3 pe-10 bg-gray-50 rounded-md min-h-[60px]">
+                <div className="p-3 pe-20 bg-gray-50 rounded-md min-h-[60px]">
                   {customText || selectedOption?.text}
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => {
-                    setIsEditing(true);
-                    setTempCustomText(customText || selectedOption?.text || '');
-                  }}
-                >
-                  <PenSquare className="h-4 w-4" />
-                </Button>
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {onAiGenerate && (
+                    <AiButton
+                      onClick={onAiGenerate}
+                      title="Generate a specific version from your notes"
+                    />
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setIsEditing(true);
+                      setTempCustomText(customText || selectedOption?.text || '');
+                    }}
+                  >
+                    <PenSquare className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             )}
 

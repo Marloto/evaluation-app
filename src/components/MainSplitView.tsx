@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from "@/components/ui/button";
-import { Settings, RotateCcw, Download, Upload } from 'lucide-react';
+import { Settings, RotateCcw, Download, Upload, Sparkles } from 'lucide-react';
 import { useConfig } from './providers/ConfigProvider';
 import { EvaluationState, EvaluationStateProvider, useEvaluationState } from './providers/EvaluationStateProvider';
 import Criterion from './Criterion';
@@ -22,6 +22,11 @@ import StarRating from './StarRating';
 import { EvaluationConfig, GradeConfig, Section } from '@/lib/types/types';
 import TemplateResetDialog from './dialogs/TemplateResetDialog';
 import UnsavedChangesDialog from './dialogs/UnsavedChangesDialog';
+import AiButton from './AiButton';
+import AiSettingsDialog from './dialogs/AiSettingsDialog';
+import AiPromptsDialog from './dialogs/AiPromptsDialog';
+import AiSuggestionsDialog, { AiChanges, AiTarget } from './dialogs/AiSuggestionsDialog';
+import { useAi } from './providers/AiProvider';
 
 // Typ für die gespeicherte Konfiguration
 interface SavedConfiguration {
@@ -62,6 +67,10 @@ const EvaluationContent = () => {
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
     const [pendingSectionSwitch, setPendingSectionSwitch] = useState<string | null>(null);
+    const [aiTarget, setAiTarget] = useState<AiTarget | null>(null);
+    const [isAiSettingsOpen, setIsAiSettingsOpen] = useState(false);
+    const [isAiPromptsOpen, setIsAiPromptsOpen] = useState(false);
+    const { isAvailable: isAiAvailable } = useAi();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -222,6 +231,26 @@ const EvaluationContent = () => {
         updateCriterion(sectionKey, criterionKey, update);
     };
 
+    // Writes the accepted proposals back into the evaluation state.
+    const handleAiApply = (sectionKey: string, changes: AiChanges) => {
+        let applied = 0;
+
+        if (changes.preamble !== undefined) {
+            updatePreamble(sectionKey, changes.preamble);
+            setPreambleTexts(prev => ({ ...prev, [sectionKey]: changes.preamble as string }));
+            applied += 1;
+        }
+
+        Object.entries(changes.criteria ?? {}).forEach(([criterionKey, text]) => {
+            updateCriterion(sectionKey, criterionKey, { customText: text });
+            applied += 1;
+        });
+
+        if (applied > 0) {
+            toast.success(`${applied} AI proposal${applied === 1 ? '' : 's'} applied`);
+        }
+    };
+
     const handleTemplateLoad = (templateId: string) => {
         loadTemplate(templateId);
         resetAll();
@@ -252,13 +281,19 @@ const EvaluationContent = () => {
                             </span>
                         </div>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => startEditing(sectionKey)}
-                    >
-                        <PenSquare className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <AiButton
+                            onClick={() => setAiTarget({ mode: 'preamble', sectionKey })}
+                            title="Generate an intro for this section from your notes"
+                        />
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => startEditing(sectionKey)}
+                        >
+                            <PenSquare className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
 
                 {editingPreamble === sectionKey ? (
@@ -299,9 +334,23 @@ const EvaluationContent = () => {
                         value={state.sections[sectionKey]?.criteria[criterionKey]?.score}
                         customText={state.sections[sectionKey]?.criteria[criterionKey]?.customText}
                         excludeFromTotal={criterion.excludeFromTotal}
+                        onAiGenerate={() => setAiTarget({ mode: 'criterion', sectionKey, criterionKey })}
                         onUpdate={(update) => handleCriterionUpdate(sectionKey, criterionKey, update)}
                     />
                 ))}
+
+                <AiButton
+                    variant="outline"
+                    className="w-full"
+                    label="Generate intro and all texts for this section"
+                    title={
+                        completedCriteria === 0
+                            ? 'Select at least one rating first'
+                            : 'Generate the intro and every rated criterion in one request'
+                    }
+                    disabled={completedCriteria === 0}
+                    onClick={() => setAiTarget({ mode: 'section', sectionKey })}
+                />
             </div>
         );
     };
@@ -346,6 +395,15 @@ const EvaluationContent = () => {
                                     >
                                         <Download className="h-4 w-4 mr-2" />
                                         Export
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setIsAiSettingsOpen(true)}
+                                        title={isAiAvailable ? 'AI settings' : 'No API key configured'}
+                                    >
+                                        <Sparkles className={`h-4 w-4 mr-2 ${isAiAvailable ? 'text-purple-600' : 'text-gray-400'}`} />
+                                        AI
                                     </Button>
                                     <Button
                                         variant="outline"
@@ -397,6 +455,32 @@ const EvaluationContent = () => {
                 onClose={() => setIsResetDialogOpen(false)}
                 onConfirm={handleTemplateLoad}
                 templates={templates}
+            />
+
+            <AiSettingsDialog
+                isOpen={isAiSettingsOpen}
+                onClose={() => setIsAiSettingsOpen(false)}
+                onOpenPrompts={() => {
+                    setIsAiSettingsOpen(false);
+                    setIsAiPromptsOpen(true);
+                }}
+            />
+
+            <AiPromptsDialog
+                isOpen={isAiPromptsOpen}
+                onClose={() => setIsAiPromptsOpen(false)}
+            />
+
+            <AiSuggestionsDialog
+                target={aiTarget}
+                sections={config.sections}
+                evaluationState={state}
+                onClose={() => setAiTarget(null)}
+                onApply={handleAiApply}
+                onOpenSettings={() => {
+                    setAiTarget(null);
+                    setIsAiSettingsOpen(true);
+                }}
             />
 
             <UnsavedChangesDialog
