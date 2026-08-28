@@ -11,12 +11,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Weightable } from '@/lib/types/types';
 
 interface SectionEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { title: string; weight: number }) => void;
+  onSave: (data: { title: string; weight: number; purpose?: string }) => void;
   mode: 'add' | 'edit';
   initialData?: Weightable;
 }
@@ -31,8 +32,13 @@ export const SectionEditDialog: React.FC<SectionEditDialogProps> = ({
   const memoizedInitialData = React.useMemo(() => ({
     title: initialData.title,
     weight: initialData.weight,
-}), [initialData.title, initialData.weight]);
-  const [formData, setFormData] = React.useState(initialData);
+    purpose: initialData.purpose ?? '',
+}), [initialData.title, initialData.weight, initialData.purpose]);
+  const [formData, setFormData] = React.useState({
+    title: initialData.title,
+    weight: initialData.weight,
+    purpose: initialData.purpose ?? ''
+  });
 
   React.useEffect(() => {
     setFormData(memoizedInitialData);
@@ -42,7 +48,8 @@ export const SectionEditDialog: React.FC<SectionEditDialogProps> = ({
     e.preventDefault();
     onSave({
       title: formData.title,
-      weight: formData.weight
+      weight: formData.weight,
+      purpose: formData.purpose.trim() || undefined
     });
   };
 
@@ -76,6 +83,19 @@ export const SectionEditDialog: React.FC<SectionEditDialogProps> = ({
               max="1"
               className="w-full"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="purpose">Purpose</Label>
+            <Textarea
+              id="purpose"
+              value={formData.purpose}
+              onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
+              placeholder="What this section covers and what its intro text should contain..."
+              className="min-h-[120px]"
+            />
+            <p className="text-xs text-gray-500">
+              Shown below the section heading and passed to the AI as context.
+            </p>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>

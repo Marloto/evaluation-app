@@ -10,6 +10,8 @@ export interface ScaleOption {
 export interface CriterionContext {
     criterionKey: string;
     title: string;
+    /** What this criterion looks at, from the configuration. */
+    purpose?: string;
     score: number;
     /** Text that is currently in use (custom text or the selected option text). */
     selectedText: string;
@@ -20,6 +22,8 @@ export interface CriterionContext {
 export interface SectionContext {
     sectionKey: string;
     title: string;
+    /** What this section covers, from the configuration. */
+    purpose?: string;
     /** Current intro text of the section, if any. */
     preamble?: string;
     criteria: CriterionContext[];
@@ -49,6 +53,7 @@ const criterionVars = (criterion: CriterionContext): TemplateVars => ({
     criterionTitle: criterion.title,
     criterionScore: criterion.score,
     criterionText: criterion.selectedText,
+    criterionPurpose: criterion.purpose?.trim() ?? '',
     scale: renderScale(criterion.scale),
 });
 
@@ -69,6 +74,7 @@ const taskVars = (
     thesisAbstract: context.thesisAbstract ?? '',
     notes: context.notes.trim(),
     sectionTitle: section.title,
+    sectionPurpose: section.purpose?.trim() ?? '',
     sectionPreamble: section.preamble ?? '',
     criteriaList: section.criteria
         .map(criterion => renderCriterionBlock(criterion, prompts))
@@ -120,11 +126,13 @@ export const buildSectionPrompt = (
 export const SAMPLE_SECTION: SectionContext = {
     sectionKey: 'form',
     title: 'Form der Arbeit',
+    purpose: 'Wie die Arbeit in ihrer Form umgesetzt wurde. Eine Preample könnte herausstellen, wo die Form abweicht bzw. wo sie sich auszeichnet.',
     preamble: 'Die Arbeit folgt insgesamt den formalen Vorgaben.',
     criteria: [
         {
             criterionKey: 'scientific_approach',
             title: 'Wissenschaftliches Vorgehen',
+            purpose: 'Einhaltung wissenschaftlicher Standards bei Vorgehen und Darstellung.',
             score: 4,
             selectedText: 'Das wissenschaftliche Vorgehen entspricht gut den Standards',
             scale: [

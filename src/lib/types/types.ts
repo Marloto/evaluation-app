@@ -1,6 +1,11 @@
 export interface Weightable {
     title: string;
     weight: number;
+    /**
+     * Short description of what this section or criterion is about. Shown in the
+     * evaluation view and passed to the AI as context for the generated texts.
+     */
+    purpose?: string;
 }
 
 export interface Section extends Weightable {

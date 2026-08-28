@@ -12,12 +12,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Textarea } from "@/components/ui/textarea"
 import { Weightable } from '@/lib/types/types';
 
 interface CriterionEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: { title: string; weight: number; isBonus?: boolean }) => void;
+  onSave: (data: { title: string; weight: number; isBonus?: boolean; purpose?: string }) => void;
   mode: 'add' | 'edit';
   initialData?: Weightable & { excludeFromTotal?: boolean };
 }
@@ -32,19 +33,22 @@ export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
   const memoizedInitialData = React.useMemo(() => ({
     title: initialData.title,
     weight: initialData.weight,
-    excludeFromTotal: initialData.excludeFromTotal
-}), [initialData.title, initialData.weight, initialData.excludeFromTotal]);
+    excludeFromTotal: initialData.excludeFromTotal,
+    purpose: initialData.purpose ?? ''
+}), [initialData.title, initialData.weight, initialData.excludeFromTotal, initialData.purpose]);
   const [formData, setFormData] = React.useState({
     title: initialData.title,
     weight: initialData.weight,
-    isBonus: initialData.excludeFromTotal || false
+    isBonus: initialData.excludeFromTotal || false,
+    purpose: initialData.purpose ?? ''
   });
 
   React.useEffect(() => {
     setFormData({
       title: memoizedInitialData.title,
       weight: memoizedInitialData.weight,
-      isBonus: memoizedInitialData.excludeFromTotal || false
+      isBonus: memoizedInitialData.excludeFromTotal || false,
+      purpose: memoizedInitialData.purpose
     });
   }, [memoizedInitialData]);
 
@@ -53,7 +57,8 @@ export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
     onSave({
       title: formData.title,
       weight: formData.weight,
-      isBonus: formData.isBonus
+      isBonus: formData.isBonus,
+      purpose: formData.purpose.trim() || undefined
     });
   };
 
@@ -87,6 +92,19 @@ export const CriterionEditDialog: React.FC<CriterionEditDialogProps> = ({
               max="1"
               className="w-full"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="purpose">Purpose (optional)</Label>
+            <Textarea
+              id="purpose"
+              value={formData.purpose}
+              onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
+              placeholder="What this criterion looks at..."
+              className="min-h-[80px]"
+            />
+            <p className="text-xs text-gray-500">
+              Passed to the AI as context for this criterion.
+            </p>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox

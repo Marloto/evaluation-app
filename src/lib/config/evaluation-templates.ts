@@ -4,6 +4,7 @@ export const evaluationConfig: EvaluationConfig = {
   sections: {
     preface: {
       title: "Vorwort",
+      purpose: "Generelle Einführung in das Thema der Arbeit und wie der Studierende sich bzgl. dem methodischen Vorgehen und der Umsetzung bewegt hat sowie einer Wertung der Selbstständigkeit. Die Preample sollte kurz das Thema und einen Abriss des Untersuchungsschwerpunktes / der Forschungsfrage und gewählten Methodik enthalten.",
       weight: 0.2,
       criteria: {
         independence: {
@@ -43,6 +44,7 @@ export const evaluationConfig: EvaluationConfig = {
     },
     form: {
       title: "Form der Arbeit",
+      purpose: "Wie die Arbeit in Ihrer Form umgesetzt wurde, u.a. das wissenschaftliche Vorgehen, die Fragestellung und Methodik, gibt es einen geeigneten Related Work, wie war die Quellenarbeit, wie sieht die Darstellung der Durchführung aus, u.a. ist diese Wiederholbar, enthält sie ausreichend Informationen. Eine Preample könnte herausstellen wo die Form abweicht bzw. wo sie sich auszeichnet.",
       weight: 0.3,
       criteria: {
         scientific_approach: {
@@ -104,6 +106,7 @@ export const evaluationConfig: EvaluationConfig = {
     },
     structure: {
       title: "Gliederung",
+      purpose: "Wie ist die Arbeit strukturiert, es steht der logische Aufbau und die Strukturierung im Vordergrund, die formale Qualität bezieht sich auf das Vorhandensein üblicher Elemente wie Diskussion, Related Work, Einleitung, Fazit, usw. Die Preample sollte einen kurzen Outline der Arbeit dokumentieren.",
       weight: 0.15,
       criteria: {
         logical_structure: {
@@ -143,6 +146,7 @@ export const evaluationConfig: EvaluationConfig = {
     },
     content: {
       title: "Inhalt",
+      purpose: "Wie hat sich die Arbeit inhaltlich mit dem Thema auseinandergesetzt. Ist Argumentationsverlauf nachvollziehbar, ist ein Grundlagenverständnis klar erkennbar, gibt es eine methodisch saubere Durchführung und Umsetzung mit Bezug zur Forschungsfrage wie auch werden die Ergebnisse evaluiert und abschließend diskutiert. Eine Preample könnte kurz herausheben, was die Arbeit insbesondere auszeichnet.",
       weight: 0.35,
       criteria: {
         argumentation: {

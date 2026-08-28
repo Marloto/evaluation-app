@@ -5,12 +5,12 @@ import { Option } from '@/lib/types/types';
 import { useConfig } from './providers/ConfigProvider';
 
 interface ConfigurationContextValue {
-  addSection: (title: string, weight: number) => void;
-  updateSection: (sectionKey: string, title: string, weight: number) => void;
+  addSection: (title: string, weight: number, purpose?: string) => void;
+  updateSection: (sectionKey: string, title: string, weight: number, purpose?: string) => void;
   deleteSection: (sectionKey: string) => void;
   
-  addCriterion: (sectionKey: string, title: string, weight: number, isBonus?: boolean) => void;
-  updateCriterion: (sectionKey: string, criterionKey: string, title: string, weight: number, isBonus?: boolean) => void;
+  addCriterion: (sectionKey: string, title: string, weight: number, isBonus?: boolean, purpose?: string) => void;
+  updateCriterion: (sectionKey: string, criterionKey: string, title: string, weight: number, isBonus?: boolean, purpose?: string) => void;
   deleteCriterion: (sectionKey: string, criterionKey: string) => void;
   
   addOption: (sectionKey: string, criterionKey: string, text: string, score: number) => void;
@@ -24,27 +24,29 @@ const ConfigurationContext = createContext<ConfigurationContextValue | null>(nul
 export const ConfigurationManager = ({ children }: { children: React.ReactNode }) => {
   const { config, updateConfig } = useConfig();
 
-  const addSection = useCallback((title: string, weight: number) => {
+  const addSection = useCallback((title: string, weight: number, purpose?: string) => {
     const newConfig = { ...config };
     const sectionKey = title.toLowerCase().replace(/\s+/g, '_');
     
     newConfig.sections[sectionKey] = {
       title,
       weight,
+      purpose,
       criteria: {}
     };
     
     updateConfig(newConfig);
   }, [config, updateConfig]);
 
-  const updateSection = useCallback((sectionKey: string, title: string, weight: number) => {
+  const updateSection = useCallback((sectionKey: string, title: string, weight: number, purpose?: string) => {
     const newConfig = { ...config };
     if (!newConfig.sections[sectionKey]) return;
     
     newConfig.sections[sectionKey] = {
       ...newConfig.sections[sectionKey],
       title,
-      weight
+      weight,
+      purpose
     };
     
     updateConfig(newConfig);
@@ -60,7 +62,8 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     sectionKey: string, 
     title: string, 
     weight: number,
-    isBonus?: boolean
+    isBonus?: boolean,
+    purpose?: string
   ) => {
     const newConfig = { ...config };
     if (!newConfig.sections[sectionKey]) return;
@@ -69,6 +72,7 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     newConfig.sections[sectionKey].criteria[criterionKey] = {
       title,
       weight,
+      purpose,
       excludeFromTotal: isBonus,
       options: []
     };
@@ -81,7 +85,8 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
     criterionKey: string,
     title: string,
     weight: number,
-    isBonus?: boolean
+    isBonus?: boolean,
+    purpose?: string
   ) => {
     const newConfig = { ...config };
     if (!newConfig.sections[sectionKey]?.criteria[criterionKey]) return;
@@ -90,6 +95,7 @@ export const ConfigurationManager = ({ children }: { children: React.ReactNode }
       ...newConfig.sections[sectionKey].criteria[criterionKey],
       title,
       weight,
+      purpose,
       excludeFromTotal: isBonus
     };
     

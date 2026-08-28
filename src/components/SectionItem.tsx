@@ -56,11 +56,12 @@ export const SectionItem: React.FC<SectionItemProps> = ({
         });
     };
 
-    const handleEditSave = (data: { title: string; weight: number }) => {
+    const handleEditSave = (data: { title: string; weight: number; purpose?: string }) => {
         configManager.updateSection(
             sectionKey,
             data.title,
-            data.weight
+            data.weight,
+            data.purpose
         );
         handleDialogClose();
     };
@@ -124,7 +125,8 @@ export const SectionItem: React.FC<SectionItemProps> = ({
                 mode="edit"
                 initialData={{
                     title: section.title,
-                    weight: section.weight
+                    weight: section.weight,
+                    purpose: section.purpose
                 }}
             />
 
@@ -169,8 +171,8 @@ export const SectionList: React.FC<SectionListProps> = ({
         setDialogState({ isOpen: false });
     };
 
-    const handleDialogSave = (data: { title: string; weight: number }) => {
-        configManager.addSection(data.title, data.weight);
+    const handleDialogSave = (data: { title: string; weight: number; purpose?: string }) => {
+        configManager.addSection(data.title, data.weight, data.purpose);
         handleDialogClose();
     };
 

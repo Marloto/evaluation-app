@@ -44,6 +44,7 @@ export const buildCriterionContext = (
 ): CriterionContext => ({
     criterionKey,
     title: criterion.title,
+    purpose: criterion.purpose,
     score: state.score as number,
     selectedText: resolveText(criterion, state),
     scale: criterion.options.map(option => ({ score: option.score, text: option.text })),
@@ -69,6 +70,7 @@ export const buildSectionContext = (
     return {
         sectionKey,
         title: section.title,
+        purpose: section.purpose,
         preamble: sectionState?.preamble?.trim() || undefined,
         criteria,
     };

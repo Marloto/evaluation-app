@@ -28,6 +28,7 @@ const TASK_VARIABLES = [
     'thesisAbstract',
     'notes',
     'sectionTitle',
+    'sectionPurpose',
     'sectionPreamble',
 ];
 
@@ -42,7 +43,14 @@ export const PROMPT_FIELDS: PromptFieldInfo[] = [
         key: 'criterionBlock',
         label: 'Criterion block',
         description: 'How a single rated criterion is presented to the model.',
-        variables: ['criterionKey', 'criterionTitle', 'criterionScore', 'criterionText', 'scale'],
+        variables: [
+            'criterionKey',
+            'criterionTitle',
+            'criterionPurpose',
+            'criterionScore',
+            'criterionText',
+            'scale',
+        ],
     },
     {
         key: 'criterion',
@@ -70,17 +78,28 @@ export const getPromptFieldInfo = (key: PromptField): PromptFieldInfo =>
 const GERMAN: PromptSet = {
     system: `Du unterstützt eine Gutachterin oder einen Gutachter beim Schreiben eines Gutachtens für eine wissenschaftliche Abschlussarbeit.
 
-Aus einer Bewertungsmatrix wurden bereits Bewertungsstufen ausgewählt. Deine Aufgabe ist es, die zugehörigen Standardformulierungen mit den konkreten Beobachtungen aus den Notizen zu einer spezifischen, belegten Formulierung zu verdichten.
+Aus einer Bewertungsmatrix wurden bereits Bewertungsstufen ausgewählt. Daraus erzeugst du konkrete, durch die Notizen belegte Gutachtentexte: Formulierungen zu einzelnen Kriterien und einleitende Absätze für ganze Bewertungsbereiche.
 
-Verbindliche Regeln:
+Allgemeine Regeln:
 - Sprache der Ausgabe: {{language}}.
-- Die Bewertungsstufe darf nicht verändert werden. Der Tenor der vorgegebenen Formulierung bleibt exakt erhalten - weder aufwerten noch abwerten.
 - Verwende ausschließlich Fakten aus den Notizen. Erfinde keine Titel, Kapitel, Zahlen, Methoden oder Werkzeuge.
 - Titel und Abstract dienen nur der Einordnung. Sie sind Selbstauskunft der Arbeit und keine Belege für die Bewertung - Belege stammen ausschließlich aus den Notizen.
-- Enthalten die Notizen nichts Passendes zu einem Kriterium, formuliere die Vorlage nur sprachlich um und lasse sie inhaltlich unverändert.
 - Wissenschaftlicher Gutachtenstil: sachlich, dritte Person, keine direkte Anrede, keine Aufzählungszeichen, kein Markdown.
-- Fließtext, in der Regel ein bis drei Sätze pro Formulierung.
 - Die Varianten sollen sich unterscheiden: unterschiedlicher Detailgrad oder unterschiedlicher Fokus auf die Belege - nicht nur andere Synonyme.
+
+Die beiden Textarten werden unterschiedlich behandelt:
+
+1. Kriterienformulierungen gehen von einer vorgegebenen Formulierung aus, die zur gewählten Bewertungsstufe gehört.
+- Die Bewertungsstufe darf nicht verändert werden. Der Tenor der vorgegebenen Formulierung bleibt exakt erhalten - weder aufwerten noch abwerten.
+- Enthalten die Notizen nichts Passendes zu einem Kriterium, formuliere die Vorlage nur sprachlich um und lasse sie inhaltlich unverändert.
+- Jede Formulierung bezieht sich ausschließlich auf ihr eigenes Kriterium.
+- Fließtext, in der Regel ein bis drei Sätze.
+
+2. Einleitende Absätze (Preamble) fassen einen ganzen Bewertungsbereich zusammen.
+- Es gibt keine vorgegebene Formulierung und keine eigene Bewertungsstufe. Die Einleitung ordnet den Bereich ein, statt einzelne Kriterien nachzubewerten oder aufzuzählen.
+- Der inhaltliche Fokus ergibt sich aus der Bereichsbeschreibung des Bewertungsbereichs.
+- Die Einleitung nimmt die Kriterienformulierungen weder vorweg noch wiederholt sie diese.
+- Zwei bis vier Sätze.
 {{#if extraInstructions}}
 Zusätzliche Vorgaben der Nutzerin oder des Nutzers:
 {{extraInstructions}}
@@ -88,7 +107,8 @@ Zusätzliche Vorgaben der Nutzerin oder des Nutzers:
 
     criterionBlock: `<kriterium key="{{criterionKey}}">
   Titel: {{criterionTitle}}
-  Gewählte Stufe: {{criterionScore}}
+{{#if criterionPurpose}}  Worum es geht: {{criterionPurpose}}
+{{/if}}  Gewählte Stufe: {{criterionScore}}
   Vorgegebene Formulierung: {{criterionText}}
 {{#if scale}}  Bewertungsskala des Kriteriums:
 {{scale}}
@@ -105,6 +125,11 @@ Zusätzliche Vorgaben der Nutzerin oder des Nutzers:
 </notizen>{{/if}}{{#unless notes}}<notizen>Keine Notizen vorhanden.</notizen>{{/unless}}
 
 Bewertungsbereich: {{sectionTitle}}
+{{#if sectionPurpose}}
+<bereichsbeschreibung>
+{{sectionPurpose}}
+</bereichsbeschreibung>
+{{/if}}
 
 {{criterionBlock}}
 
@@ -121,14 +146,18 @@ Erzeuge {{variants}} Varianten der vorgegebenen Formulierung für dieses Kriteri
 </notizen>{{/if}}{{#unless notes}}<notizen>Keine Notizen vorhanden.</notizen>{{/unless}}
 
 Bewertungsbereich: {{sectionTitle}}
-{{#if sectionPreamble}}
+{{#if sectionPurpose}}
+<bereichsbeschreibung>
+{{sectionPurpose}}
+</bereichsbeschreibung>
+{{/if}}{{#if sectionPreamble}}
 Bisheriger Einleitungstext:
 {{sectionPreamble}}
 {{/if}}
 Bewertete Kriterien dieses Bereichs:
 {{criteriaList}}
 
-Erzeuge {{variants}} Varianten eines einleitenden Absatzes für diesen Bewertungsbereich. Der Absatz führt in den Bereich ein und fasst den Gesamteindruck zusammen, ohne die einzelnen Kriterienformulierungen vorwegzunehmen oder zu wiederholen. Zwei bis vier Sätze. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
+Erzeuge {{variants}} Varianten eines einleitenden Absatzes für diesen Bewertungsbereich. Der Absatz führt in den Bereich ein und fasst den Gesamteindruck zusammen, ohne die einzelnen Kriterienformulierungen vorwegzunehmen oder zu wiederholen. {{#if sectionPurpose}}In der Bereichsbeschreibung finden sich Details zum Fokus des einleitenden Absatzes. {{/if}}Zwei bis vier Sätze. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
 
     section: `{{#if thesisTitle}}Titel der Arbeit: {{thesisTitle}}
 {{/if}}{{#if thesisAbstract}}
@@ -141,7 +170,11 @@ Erzeuge {{variants}} Varianten eines einleitenden Absatzes für diesen Bewertung
 </notizen>{{/if}}{{#unless notes}}<notizen>Keine Notizen vorhanden.</notizen>{{/unless}}
 
 Bewertungsbereich: {{sectionTitle}}
-{{#if sectionPreamble}}
+{{#if sectionPurpose}}
+<bereichsbeschreibung>
+{{sectionPurpose}}
+</bereichsbeschreibung>
+{{/if}}{{#if sectionPreamble}}
 Bisheriger Einleitungstext:
 {{sectionPreamble}}
 {{/if}}
@@ -149,7 +182,7 @@ Bewertete Kriterien dieses Bereichs:
 {{criteriaList}}
 
 Erzeuge für diesen Bewertungsbereich:
-1. {{variants}} Varianten eines einleitenden Absatzes (zwei bis vier Sätze), der in den Bereich einführt und den Gesamteindruck zusammenfasst, ohne die Kriterienformulierungen zu wiederholen.
+1. {{variants}} Varianten eines einleitenden Absatzes (zwei bis vier Sätze), der in den Bereich einführt und den Gesamteindruck zusammenfasst, ohne die Kriterienformulierungen zu wiederholen. {{#if sectionPurpose}}In der Bereichsbeschreibung finden sich Details zum Fokus des einleitenden Absatzes.{{/if}}
 2. Für jedes der oben aufgeführten Kriterien {{variants}} Varianten der vorgegebenen Formulierung, welche die Beobachtungen aus den Notizen konkret einarbeiten.
 
 Verwende in "criterionKey" exakt die oben angegebenen Schlüssel. Bearbeite jedes Kriterium genau einmal. Achte darauf, dass sich Einleitung und Kriterienformulierungen nicht doppeln. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
@@ -158,17 +191,28 @@ Verwende in "criterionKey" exakt die oben angegebenen Schlüssel. Bearbeite jede
 const ENGLISH: PromptSet = {
     system: `You support an examiner writing the assessment report for an academic thesis.
 
-Rating levels have already been selected from an evaluation matrix. Your task is to condense the standard wording of each rating together with the concrete observations from the notes into a specific, evidence-backed formulation.
+Rating levels have already been selected from an evaluation matrix. From these you produce specific assessment text backed by the notes: formulations for individual criteria, and introductory paragraphs for whole evaluation areas.
 
-Binding rules:
+General rules:
 - Output language: {{language}}.
-- The rating level must not change. The tenor of the given wording is preserved exactly - neither upgrade nor downgrade it.
 - Use facts from the notes only. Never invent titles, chapters, numbers, methods or tools.
 - Title and abstract are for orientation only. They are the thesis's own claims, not evidence for the assessment - evidence comes from the notes alone.
-- If the notes contain nothing relevant to a criterion, only rephrase the template and leave its content unchanged.
 - Academic report style: factual, third person, no direct address, no bullet points, no markdown.
-- Continuous prose, usually one to three sentences per formulation.
 - The variants must differ from each other: different level of detail or a different focus on the evidence - not just synonyms.
+
+The two kinds of text are handled differently:
+
+1. Criterion formulations start from a given wording that belongs to the selected rating level.
+- The rating level must not change. The tenor of the given wording is preserved exactly - neither upgrade nor downgrade it.
+- If the notes contain nothing relevant to a criterion, only rephrase the template and leave its content unchanged.
+- Each formulation refers to its own criterion only.
+- Continuous prose, usually one to three sentences.
+
+2. Introductory paragraphs (preamble) summarise a whole evaluation area.
+- There is no given wording and no rating level of their own. The intro places the area in context rather than re-rating or listing the individual criteria.
+- Its focus follows from the area description of the evaluation area.
+- The intro neither anticipates nor repeats the criterion formulations.
+- Two to four sentences.
 {{#if extraInstructions}}
 Additional instructions from the user:
 {{extraInstructions}}
@@ -176,7 +220,8 @@ Additional instructions from the user:
 
     criterionBlock: `<criterion key="{{criterionKey}}">
   Title: {{criterionTitle}}
-  Selected level: {{criterionScore}}
+{{#if criterionPurpose}}  What it covers: {{criterionPurpose}}
+{{/if}}  Selected level: {{criterionScore}}
   Given wording: {{criterionText}}
 {{#if scale}}  Rating scale of this criterion:
 {{scale}}
@@ -193,6 +238,11 @@ Additional instructions from the user:
 </notes>{{/if}}{{#unless notes}}<notes>No notes available.</notes>{{/unless}}
 
 Evaluation area: {{sectionTitle}}
+{{#if sectionPurpose}}
+<area_description>
+{{sectionPurpose}}
+</area_description>
+{{/if}}
 
 {{criterionBlock}}
 
@@ -209,14 +259,18 @@ Produce {{variants}} variants of the given wording for this criterion that work 
 </notes>{{/if}}{{#unless notes}}<notes>No notes available.</notes>{{/unless}}
 
 Evaluation area: {{sectionTitle}}
-{{#if sectionPreamble}}
+{{#if sectionPurpose}}
+<area_description>
+{{sectionPurpose}}
+</area_description>
+{{/if}}{{#if sectionPreamble}}
 Current intro text:
 {{sectionPreamble}}
 {{/if}}
 Rated criteria of this area:
 {{criteriaList}}
 
-Produce {{variants}} variants of an introductory paragraph for this evaluation area. The paragraph introduces the area and summarises the overall impression without anticipating or repeating the individual criterion formulations. Two to four sentences. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
+Produce {{variants}} variants of an introductory paragraph for this evaluation area. The paragraph introduces the area and summarises the overall impression without anticipating or repeating the individual criterion formulations. {{#if sectionPurpose}}The area description states what the introductory paragraph should focus on. {{/if}}Two to four sentences. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
 
     section: `{{#if thesisTitle}}Thesis title: {{thesisTitle}}
 {{/if}}{{#if thesisAbstract}}
@@ -229,7 +283,11 @@ Produce {{variants}} variants of an introductory paragraph for this evaluation a
 </notes>{{/if}}{{#unless notes}}<notes>No notes available.</notes>{{/unless}}
 
 Evaluation area: {{sectionTitle}}
-{{#if sectionPreamble}}
+{{#if sectionPurpose}}
+<area_description>
+{{sectionPurpose}}
+</area_description>
+{{/if}}{{#if sectionPreamble}}
 Current intro text:
 {{sectionPreamble}}
 {{/if}}
@@ -237,7 +295,7 @@ Rated criteria of this area:
 {{criteriaList}}
 
 Produce for this evaluation area:
-1. {{variants}} variants of an introductory paragraph (two to four sentences) that introduces the area and summarises the overall impression without repeating the criterion formulations.
+1. {{variants}} variants of an introductory paragraph (two to four sentences) that introduces the area and summarises the overall impression without repeating the criterion formulations. {{#if sectionPurpose}}The area description states what the introductory paragraph should focus on.{{/if}}
 2. For each criterion listed above, {{variants}} variants of the given wording that work the observations from the notes in concretely.
 
 Use exactly the keys given above in "criterionKey". Handle each criterion exactly once. Make sure the intro and the criterion formulations do not duplicate each other. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,

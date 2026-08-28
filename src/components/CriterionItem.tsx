@@ -62,13 +62,14 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
         });
     };
 
-    const handleEditSave = (data: { title: string; weight: number; isBonus?: boolean }) => {
+    const handleEditSave = (data: { title: string; weight: number; isBonus?: boolean; purpose?: string }) => {
         configManager.updateCriterion(
             sectionKey,
             criterionKey,
             data.title,
             data.weight,
-            data.isBonus
+            data.isBonus,
+            data.purpose
         );
         handleDialogClose();
     };
@@ -139,6 +140,7 @@ export const CriterionItem: React.FC<CriterionItemProps> = ({
                 initialData={{
                     title: criterion.title,
                     weight: criterion.weight,
+                    purpose: criterion.purpose,
                     excludeFromTotal: criterion.excludeFromTotal
                 }}
             />
@@ -176,12 +178,13 @@ export const CriterionList: React.FC<CriterionListProps> = ({
         setDialogState({ isOpen: false });
     };
 
-    const handleDialogSave = (data: { title: string; weight: number; isBonus?: boolean }) => {
+    const handleDialogSave = (data: { title: string; weight: number; isBonus?: boolean; purpose?: string }) => {
         configManager.addCriterion(
             sectionKey,
             data.title,
             data.weight,
-            data.isBonus
+            data.isBonus,
+            data.purpose
         );
         handleDialogClose();
     };

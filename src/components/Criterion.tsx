@@ -9,9 +9,11 @@ import { Option } from '@/lib/types/types'
 import StarRating from './StarRating';
 import { Badge } from "@/components/ui/badge";
 import AiButton from './AiButton';
+import PurposeNote from './PurposeNote';
 
 interface CriterionProps {
   title: string;
+  purpose?: string;
   options: Option[];
   value?: number;
   customText?: string;
@@ -26,6 +28,7 @@ interface CriterionProps {
 
 const Criterion = ({
   title,
+  purpose,
   options,
   value,
   customText,
@@ -119,6 +122,7 @@ const Criterion = ({
         {/* Expanded Content */}
         {isExpanded && (
           <div className="mt-4 space-y-4">
+            <PurposeNote text={purpose} className="pl-6" />
             {/* Selected Option Preview */}
             {hasValue && !isEditing && (
               <div className="relative group">

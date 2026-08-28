@@ -23,6 +23,7 @@ import { EvaluationConfig, GradeConfig, Section } from '@/lib/types/types';
 import TemplateResetDialog from './dialogs/TemplateResetDialog';
 import UnsavedChangesDialog from './dialogs/UnsavedChangesDialog';
 import AiButton from './AiButton';
+import PurposeNote from './PurposeNote';
 import AiSettingsDialog from './dialogs/AiSettingsDialog';
 import AiPromptsDialog from './dialogs/AiPromptsDialog';
 import AiSuggestionsDialog, { AiChanges, AiTarget } from './dialogs/AiSuggestionsDialog';
@@ -266,9 +267,10 @@ const EvaluationContent = () => {
         
         return (
             <div key={sectionKey} className="border-t p-4">
-                <div className="flex justify-between items-center mb-4">
-                    <div className="space-y-1">
+                <div className="flex justify-between items-start mb-4">
+                    <div className="space-y-1 min-w-0 pr-4">
                         <h3 className="text-lg font-semibold">{section.title}</h3>
+                        <PurposeNote text={section.purpose} />
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                             <span>Progress: {completedCriteria}/{totalRequiredCriteria}</span>
                             <span>|</span>
@@ -330,6 +332,7 @@ const EvaluationContent = () => {
                     <Criterion
                         key={criterionKey}
                         title={criterion.title}
+                        purpose={criterion.purpose}
                         options={criterion.options}
                         value={state.sections[sectionKey]?.criteria[criterionKey]?.score}
                         customText={state.sections[sectionKey]?.criteria[criterionKey]?.customText}
