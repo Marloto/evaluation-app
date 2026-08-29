@@ -142,7 +142,6 @@ export const aiConsole = {
             ...thesis,
             notes,
             language: settings.language,
-            variants: settings.variants,
             extraInstructions: settings.extraInstructions,
         };
 

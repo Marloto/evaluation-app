@@ -7,8 +7,6 @@ export interface AiSettings {
     /** Output language of the generated texts. */
     language: string;
     effort: LlmEffort;
-    /** How many alternative versions the model should propose per item. */
-    variants: number;
     /** Free form steering appended to the system prompt. */
     extraInstructions?: string;
 }
@@ -19,7 +17,6 @@ export const DEFAULT_AI_SETTINGS: AiSettings = {
     apiKey: undefined,
     language: 'Deutsch',
     effort: 'medium',
-    variants: 3,
     extraInstructions: undefined,
 };
 
@@ -42,7 +39,6 @@ const persist = () => {
             model: current.model,
             language: current.language,
             effort: current.effort,
-            variants: current.variants,
             extraInstructions: current.extraInstructions,
         };
         localStorage.setItem(AI_SETTINGS_STORAGE_KEY, JSON.stringify(persistable));

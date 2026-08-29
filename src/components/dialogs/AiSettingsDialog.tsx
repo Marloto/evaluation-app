@@ -131,23 +131,6 @@ export const AiSettingsDialog: React.FC<AiSettingsDialogProps> = ({ isOpen, onCl
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="ai-variants">Proposals per text</Label>
-                            <Input
-                                id="ai-variants"
-                                type="number"
-                                min={1}
-                                max={6}
-                                value={settings.variants}
-                                onChange={(e) => {
-                                    const parsed = Number.parseInt(e.target.value, 10);
-                                    if (!Number.isNaN(parsed)) {
-                                        updateSettings({ variants: Math.min(6, Math.max(1, parsed)) });
-                                    }
-                                }}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
                             <Label htmlFor="ai-language">Language</Label>
                             <Input
                                 id="ai-language"

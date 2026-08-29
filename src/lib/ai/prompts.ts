@@ -33,7 +33,6 @@ export interface GenerationContext {
     /** Plain text notes taken while reading the thesis. */
     notes: string;
     language: string;
-    variants: number;
     thesisTitle?: string;
     thesisAbstract?: string;
     /** Free form extra steering from the user. */
@@ -69,7 +68,6 @@ const taskVars = (
     prompts: PromptSet
 ): TemplateVars => ({
     language: context.language,
-    variants: context.variants,
     thesisTitle: context.thesisTitle ?? '',
     thesisAbstract: context.thesisAbstract ?? '',
     notes: context.notes.trim(),
@@ -84,7 +82,6 @@ const taskVars = (
 export const buildSystemPrompt = (context: GenerationContext, prompts?: PromptSet): string =>
     renderTemplate(resolvePrompts(prompts).system, {
         language: context.language,
-        variants: context.variants,
         extraInstructions: context.extraInstructions ?? '',
     });
 
@@ -152,7 +149,6 @@ export const SAMPLE_SECTION: SectionContext = {
 export const SAMPLE_CONTEXT: GenerationContext = {
     notes: 'Kapitel 3 sauber hergeleitet.\nQuellenlage breit, aber wenig aktuelle Literatur.',
     language: 'Deutsch',
-    variants: 3,
     thesisTitle: 'Beispielarbeit',
     thesisAbstract: 'Die Arbeit untersucht ein Verfahren zur automatisierten Auswertung.',
     extraInstructions: '',

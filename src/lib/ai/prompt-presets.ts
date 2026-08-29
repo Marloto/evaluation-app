@@ -23,7 +23,6 @@ export interface PromptFieldInfo {
 
 const TASK_VARIABLES = [
     'language',
-    'variants',
     'thesisTitle',
     'thesisAbstract',
     'notes',
@@ -37,7 +36,7 @@ export const PROMPT_FIELDS: PromptFieldInfo[] = [
         key: 'system',
         label: 'System prompt',
         description: 'Applies to every request - style, rules, language.',
-        variables: ['language', 'variants', 'extraInstructions'],
+        variables: ['language', 'extraInstructions'],
     },
     {
         key: 'criterionBlock',
@@ -85,7 +84,18 @@ Allgemeine Regeln:
 - Verwende ausschließlich Fakten aus den Notizen. Erfinde keine Titel, Kapitel, Zahlen, Methoden oder Werkzeuge.
 - Titel und Abstract dienen nur der Einordnung. Sie sind Selbstauskunft der Arbeit und keine Belege für die Bewertung - Belege stammen ausschließlich aus den Notizen.
 - Wissenschaftlicher Gutachtenstil: sachlich, dritte Person, keine direkte Anrede, keine Aufzählungszeichen, kein Markdown.
-- Die Varianten müssen sich substanziell unterscheiden - andere Synonyme allein genügen nicht.
+
+Sprachliche Vorgaben - sie entscheiden über die Lesbarkeit der Texte:
+- Die Bewertung wird genau einmal ausgesprochen. Alles Weitere nennt Beobachtungen und wiederholt das Urteil nicht.
+  Schlecht: "Die praktische Umsetzung ist von herausragender Qualität, realisiert unter Verwendung performanter Systemkonzepte in Rust."
+  Gut: "Die praktische Umsetzung nutzt performante Systemkonzepte in Rust."
+- Streiche wertende Leerformeln wie "von herausragender Qualität", "ein hohes Maß an", "in besonderem Maße", "durchweg überzeugend". Der Beleg selbst trägt die Wertung.
+- Keine nachgestellten Deutungsfloskeln wie "was ... erkennen lässt", "was ... zeigt", "was ... unterstreicht". Der Satz endet mit dem Beleg.
+  Schlecht: "Sämtliche Aktivitäten wurden eigenverantwortlich durchgeführt, was angesichts der Design-Iterationen ein hohes Maß an Selbstständigkeit erkennen lässt."
+  Gut: "Aktivitäten wurden eigenverantwortlich durchgeführt, insbesondere angesichts der systematisch durchgeführten Design-Iterationen."
+- Verben statt Nominalisierungen: "nutzt" statt "unter Verwendung von", "vergleicht" statt "im Rahmen eines Vergleichs".
+- Keine verstärkenden Pauschalwörter wie "sämtliche", "durchgehend" oder "vollständig", sofern die Notizen das nicht ausdrücklich hergeben.
+- Konkrete Namen aus den Notizen - Methoden, Werkzeuge, Kapitel - tragen den Text und stehen nicht als Aufzählung am Satzende.
 
 Die beiden Textarten werden unterschiedlich behandelt:
 
@@ -93,17 +103,20 @@ Die beiden Textarten werden unterschiedlich behandelt:
 - Die Bewertungsstufe darf nicht verändert werden. Der Tenor der vorgegebenen Formulierung bleibt exakt erhalten - weder aufwerten noch abwerten.
 - Enthalten die Notizen nichts Passendes zu einem Kriterium, formuliere die Vorlage nur sprachlich um und lasse sie inhaltlich unverändert.
 - Jede Formulierung bezieht sich ausschließlich auf ihr eigenes Kriterium.
-- Die Varianten unterscheiden sich in der Länge. Gib sie von der kürzesten zur längsten aus:
-  - kürzeste Variante: die vorgegebene Formulierung, ergänzt um einen Nebensatz mit dem wichtigsten Beleg aus den Notizen. Ein Satz.
-  - mittlere Variante: etwa zwei Sätze mit dem zentralen Beleg und seiner Einordnung.
-  - längste Variante: drei bis vier Sätze, die mehrere Belege aufgreifen.
-- Werden mehr als drei Varianten verlangt, fülle die Abstufungen zwischen diesen Ankern auf; werden weniger verlangt, beginne bei der kürzesten.
+- Erzeuge genau vier Varianten, in dieser Reihenfolge und in genau diesem Satzbau:
+  1. Ein Satz. Der wichtigste Beleg wird in die vorgegebene Formulierung eingebaut - als Attribut oder Präpositionalgruppe, ohne zusätzlichen Teilsatz.
+     Beispiel: "Das methodische Vorgehen mit konsequenter DSRM-Logik ist sehr gut strukturiert und durchgehend zielführend."
+  2. Ein Satz. Die vorgegebene Formulierung bleibt stehen, der wichtigste Beleg folgt als Nebensatz mit "wobei", "da" oder "insofern".
+     Beispiel: "Das methodische Vorgehen ist sehr gut strukturiert und durchgehend zielführend, wobei die Struktur konsequent der DSRM-Logik folgt."
+  3. Zwei Sätze. Der erste bleibt nah an der Vorlage, der zweite nennt den zentralen Beleg und ordnet ihn ein.
+  4. Drei bis vier Sätze, die mehrere Belege aufgreifen.
+- Die Varianten unterscheiden sich im Satzbau, nicht nur in der Länge. Andere Synonyme allein genügen nicht.
 
 2. Einleitende Absätze (Preamble) fassen einen ganzen Bewertungsbereich zusammen.
 - Es gibt keine vorgegebene Formulierung und keine eigene Bewertungsstufe. Die Einleitung ordnet den Bereich ein, statt einzelne Kriterien nachzubewerten oder aufzuzählen.
 - Der inhaltliche Fokus ergibt sich aus der Bereichsbeschreibung des Bewertungsbereichs.
 - Die Einleitung nimmt die Kriterienformulierungen weder vorweg noch wiederholt sie diese.
-- Zwei bis vier Sätze. Hier unterscheiden sich die Varianten im Fokus und in der Gewichtung, nicht in der Länge.
+- Erzeuge genau drei Varianten von je zwei bis vier Sätzen. Sie unterscheiden sich im Fokus und in der Gewichtung, nicht in der Länge.
 {{#if extraInstructions}}
 Zusätzliche Vorgaben der Nutzerin oder des Nutzers:
 {{extraInstructions}}
@@ -137,7 +150,7 @@ Bewertungsbereich: {{sectionTitle}}
 
 {{criterionBlock}}
 
-Erzeuge {{variants}} Varianten der vorgegebenen Formulierung für dieses Kriterium, die die Beobachtungen aus den Notizen konkret einarbeiten. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
+Erzeuge die vier Varianten der vorgegebenen Formulierung für dieses Kriterium, die die Beobachtungen aus den Notizen konkret einarbeiten. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
 
     preamble: `{{#if thesisTitle}}Titel der Arbeit: {{thesisTitle}}
 {{/if}}{{#if thesisAbstract}}
@@ -161,7 +174,7 @@ Bisheriger Einleitungstext:
 Bewertete Kriterien dieses Bereichs:
 {{criteriaList}}
 
-Erzeuge {{variants}} Varianten eines einleitenden Absatzes für diesen Bewertungsbereich. Der Absatz führt in den Bereich ein und fasst den Gesamteindruck zusammen, ohne die einzelnen Kriterienformulierungen vorwegzunehmen oder zu wiederholen. {{#if sectionPurpose}}In der Bereichsbeschreibung finden sich Details zum Fokus des einleitenden Absatzes. {{/if}}Zwei bis vier Sätze. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
+Erzeuge die drei Varianten eines einleitenden Absatzes für diesen Bewertungsbereich. Der Absatz führt in den Bereich ein und fasst den Gesamteindruck zusammen, ohne die einzelnen Kriterienformulierungen vorwegzunehmen oder zu wiederholen. {{#if sectionPurpose}}In der Bereichsbeschreibung finden sich Details zum Fokus des einleitenden Absatzes. {{/if}}Zwei bis vier Sätze. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
 
     section: `{{#if thesisTitle}}Titel der Arbeit: {{thesisTitle}}
 {{/if}}{{#if thesisAbstract}}
@@ -186,10 +199,10 @@ Bewertete Kriterien dieses Bereichs:
 {{criteriaList}}
 
 Erzeuge für diesen Bewertungsbereich:
-1. {{variants}} Varianten eines einleitenden Absatzes (zwei bis vier Sätze), der in den Bereich einführt und den Gesamteindruck zusammenfasst, ohne die Kriterienformulierungen zu wiederholen. {{#if sectionPurpose}}In der Bereichsbeschreibung finden sich Details zum Fokus des einleitenden Absatzes.{{/if}}
-2. Für jedes der oben aufgeführten Kriterien {{variants}} Varianten der vorgegebenen Formulierung, welche die Beobachtungen aus den Notizen konkret einarbeiten.
+1. Drei Varianten eines einleitenden Absatzes (zwei bis vier Sätze), der in den Bereich einführt und den Gesamteindruck zusammenfasst, ohne die Kriterienformulierungen zu wiederholen. {{#if sectionPurpose}}In der Bereichsbeschreibung finden sich Details zum Fokus des einleitenden Absatzes.{{/if}}
+2. Für jedes der oben aufgeführten Kriterien die vier Varianten der vorgegebenen Formulierung, welche die Beobachtungen aus den Notizen konkret einarbeiten.
 
-Verwende in "criterionKey" exakt die oben angegebenen Schlüssel. Bearbeite jedes Kriterium genau einmal. Achte darauf, dass sich Einleitung und Kriterienformulierungen nicht doppeln. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
+Verwende in "criterionKey" exakt die oben angegebenen Schlüssel. Bearbeite jedes Kriterium genau einmal. Achte darauf, dass sich Einleitung und Kriterienformulierungen nicht doppeln und dass die Formulierungen verschiedener Kriterien nicht demselben Satzmuster folgen. Gib zu jeder Variante in "basis" kurz an, welche Notizinhalte verwendet wurden (oder "keine passenden Notizen").`,
 };
 
 const ENGLISH: PromptSet = {
@@ -202,7 +215,18 @@ General rules:
 - Use facts from the notes only. Never invent titles, chapters, numbers, methods or tools.
 - Title and abstract are for orientation only. They are the thesis's own claims, not evidence for the assessment - evidence comes from the notes alone.
 - Academic report style: factual, third person, no direct address, no bullet points, no markdown.
-- The variants must differ substantially from each other - different synonyms alone are not enough.
+
+Style rules - these decide how readable the texts are:
+- The verdict is stated exactly once. Everything after it names observations and does not repeat the judgement.
+  Bad: "The implementation is of outstanding quality, realised through the use of high-performance system concepts in Rust."
+  Good: "The implementation uses high-performance system concepts in Rust."
+- Drop empty evaluative phrases such as "of outstanding quality", "a high degree of", "to a particular extent", "consistently convincing". The evidence itself carries the judgement.
+- No trailing interpretive tags such as "which shows that ...", "which demonstrates ...", "thereby underlining ...". The sentence ends on the evidence.
+  Bad: "All activities were carried out independently, which, given the design iterations, shows a high degree of autonomy."
+  Good: "Activities were carried out independently, particularly given the systematic design iterations."
+- Verbs instead of nominalisations: "uses" instead of "through the use of", "compares" instead of "in the context of a comparison".
+- No blanket intensifiers such as "all", "throughout" or "fully" unless the notes explicitly support them.
+- Concrete names from the notes - methods, tools, chapters - carry the text and do not sit as a list at the end of the sentence.
 
 The two kinds of text are handled differently:
 
@@ -210,17 +234,20 @@ The two kinds of text are handled differently:
 - The rating level must not change. The tenor of the given wording is preserved exactly - neither upgrade nor downgrade it.
 - If the notes contain nothing relevant to a criterion, only rephrase the template and leave its content unchanged.
 - Each formulation refers to its own criterion only.
-- The variants differ in length. Return them from shortest to longest:
-  - shortest variant: the given wording extended by a subordinate clause carrying the most important piece of evidence from the notes. One sentence.
-  - middle variant: about two sentences, with the central piece of evidence and how it is to be read.
-  - longest variant: three to four sentences that pick up several pieces of evidence.
-- If more than three variants are requested, fill in the gradations between these anchors; if fewer are requested, start with the shortest.
+- Produce exactly four variants, in this order and with exactly these sentence shapes:
+  1. One sentence. The most important piece of evidence is built into the given wording as a modifier or prepositional phrase, without an added clause.
+     Example: "The methodological approach, following a consistent DSRM logic, is very well structured and purposeful throughout."
+  2. One sentence. The given wording stays intact and the most important piece of evidence follows as a subordinate clause introduced by "with", "as" or "in that".
+     Example: "The methodological approach is very well structured and purposeful throughout, with its structure following the DSRM logic consistently."
+  3. Two sentences. The first stays close to the template, the second names the central piece of evidence and places it in context.
+  4. Three to four sentences that pick up several pieces of evidence.
+- The variants differ in sentence structure, not only in length. Different synonyms alone are not enough.
 
 2. Introductory paragraphs (preamble) summarise a whole evaluation area.
 - There is no given wording and no rating level of their own. The intro places the area in context rather than re-rating or listing the individual criteria.
 - Its focus follows from the area description of the evaluation area.
 - The intro neither anticipates nor repeats the criterion formulations.
-- Two to four sentences. Here the variants differ in focus and emphasis, not in length.
+- Produce exactly three variants of two to four sentences each. They differ in focus and emphasis, not in length.
 {{#if extraInstructions}}
 Additional instructions from the user:
 {{extraInstructions}}
@@ -254,7 +281,7 @@ Evaluation area: {{sectionTitle}}
 
 {{criterionBlock}}
 
-Produce {{variants}} variants of the given wording for this criterion that work the observations from the notes in concretely. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
+Produce the four variants of the given wording for this criterion that work the observations from the notes in concretely. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
 
     preamble: `{{#if thesisTitle}}Thesis title: {{thesisTitle}}
 {{/if}}{{#if thesisAbstract}}
@@ -278,7 +305,7 @@ Current intro text:
 Rated criteria of this area:
 {{criteriaList}}
 
-Produce {{variants}} variants of an introductory paragraph for this evaluation area. The paragraph introduces the area and summarises the overall impression without anticipating or repeating the individual criterion formulations. {{#if sectionPurpose}}The area description states what the introductory paragraph should focus on. {{/if}}Two to four sentences. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
+Produce the three variants of an introductory paragraph for this evaluation area. The paragraph introduces the area and summarises the overall impression without anticipating or repeating the individual criterion formulations. {{#if sectionPurpose}}The area description states what the introductory paragraph should focus on. {{/if}}Two to four sentences. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
 
     section: `{{#if thesisTitle}}Thesis title: {{thesisTitle}}
 {{/if}}{{#if thesisAbstract}}
@@ -303,10 +330,10 @@ Rated criteria of this area:
 {{criteriaList}}
 
 Produce for this evaluation area:
-1. {{variants}} variants of an introductory paragraph (two to four sentences) that introduces the area and summarises the overall impression without repeating the criterion formulations. {{#if sectionPurpose}}The area description states what the introductory paragraph should focus on.{{/if}}
-2. For each criterion listed above, {{variants}} variants of the given wording that work the observations from the notes in concretely.
+1. Three variants of an introductory paragraph (two to four sentences) that introduces the area and summarises the overall impression without repeating the criterion formulations. {{#if sectionPurpose}}The area description states what the introductory paragraph should focus on.{{/if}}
+2. For each criterion listed above, the four variants of the given wording that work the observations from the notes in concretely.
 
-Use exactly the keys given above in "criterionKey". Handle each criterion exactly once. Make sure the intro and the criterion formulations do not duplicate each other. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
+Use exactly the keys given above in "criterionKey". Handle each criterion exactly once. Make sure the intro and the criterion formulations do not duplicate each other, and that the formulations of different criteria do not follow the same sentence pattern. For each variant, state briefly in "basis" which note content was used (or "no matching notes").`,
 };
 
 export interface PromptPreset {

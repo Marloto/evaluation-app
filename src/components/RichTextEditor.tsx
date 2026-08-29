@@ -95,19 +95,35 @@ const editorStyles = `
 
     .ProseMirror ul {
         list-style-type: disc;
-        padding-left: 1.5em;
+        padding-left: 1.5rem;
         margin: 1em 0;
+    }
+
+    .ProseMirror ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+        margin: 1em 0;
+    }
+
+    /* Verschachtelte Listen: kein voller Absatz-Abstand */
+    .ProseMirror li > ul,
+    .ProseMirror li > ol {
+        margin: 0.25em 0;
+    }
+
+    .ProseMirror li {
+        margin: 0.25em 0;
     }
 
     .ProseMirror li p {
         margin: 0;
     }
-    
-    .ProseMirror ol {
-        list-style-type: decimal;
-        padding-left: 1.5em;
-        margin: 1em 0;
-    }
+
+    /* Marker pro Ebene wechseln, damit Hierarchie lesbar bleibt */
+    .ProseMirror ul ul { list-style-type: circle; }
+    .ProseMirror ul ul ul { list-style-type: square; }
+    .ProseMirror ol ol { list-style-type: lower-alpha; }
+    .ProseMirror ol ol ol { list-style-type: lower-roman; }
 
     .ProseMirror blockquote {
         border-left: 3px solid #e5e7eb;

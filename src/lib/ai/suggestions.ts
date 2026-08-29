@@ -40,7 +40,6 @@ export interface SectionSuggestionsResponse {
 export interface GenerateOptions {
     signal?: AbortSignal;
     /** Overrides for the ambient AI settings. */
-    variants?: number;
     language?: string;
     thesisTitle?: string;
     thesisAbstract?: string;
@@ -52,7 +51,6 @@ const buildContext = (notes: string, options?: GenerateOptions): GenerationConte
     return {
         notes,
         language: options?.language ?? settings.language,
-        variants: options?.variants ?? settings.variants,
         thesisTitle: options?.thesisTitle,
         thesisAbstract: options?.thesisAbstract,
         extraInstructions: options?.extraInstructions ?? settings.extraInstructions,
