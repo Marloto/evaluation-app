@@ -4,11 +4,12 @@ export const evaluationConfig: EvaluationConfig = {
   sections: {
     preface: {
       title: "Vorwort",
-      purpose: "Generelle Einführung in das Thema der Arbeit und wie der Studierende sich bzgl. dem methodischen Vorgehen und der Umsetzung bewegt hat sowie einer Wertung der Selbstständigkeit. Die Preample sollte kurz das Thema und einen Abriss des Untersuchungsschwerpunktes / der Forschungsfrage und gewählten Methodik enthalten.",
+      purpose: "Generelle Einführung in das Thema der Arbeit und wie der Studierende sich bzgl. dem methodischen Vorgehen und der Umsetzung bewegt hat sowie einer Wertung der Selbstständigkeit. Die Preample sollte kurz das Thema und einen Abriss des Untersuchungsschwerpunktes bzw. der Forschungsfrage und gewählten Methodik enthalten.",
       weight: 0.2,
       criteria: {
         independence: {
           title: "Selbstständigkeit",
+          purpose: "Bewertet, wie eigenständig der Studierende die Arbeit bearbeitet hat: Themenfindung, Planung, Problemlösung und Entscheidungen im Verlauf. Hoher Betreuungsbedarf, häufiges Nachsteuern oder das Angewiesensein auf konkrete Vorgaben führen zu einer niedrigeren Bewertung; eigenständige Initiative und selbst getroffene, tragfähige Entscheidungen zu einer höheren.",
           weight: 0.3,
           options: [
             { text: "Die Arbeit zeigt wenig eigenständige wissenschaftliche Leistung", score: 1 },
@@ -20,6 +21,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         methodology: {
           title: "Methodisches Vorgehen",
+          purpose: "Bewertet das grundsätzliche methodische Vorgehen zur Bearbeitung der Aufgabenstellung. Entscheidend ist, ob die gewählte Methodik geeignet ist, die Forschungsfrage tatsächlich zu beantworten, ob sie nachvollziehbar begründet und konsequent durchgehalten wurde.",
           weight: 0.3,
           options: [
             { text: "Das methodische Vorgehen zeigt grundlegende Mängel und geringe Systematik", score: 1 },
@@ -31,6 +33,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         implementation: {
           title: "Umsetzung der Aufgabenstellung",
+          purpose: "Bewertet, ob die gestellte Aufgabe im erwarteten Umfang bearbeitet und gelöst wurde. Maßstab ist die Abdeckung der vereinbarten Ziele und Teilaufgaben; Lücken oder Auslassungen senken die Bewertung, sinnvolle und begründete Erweiterungen über die Aufgabenstellung hinaus heben sie an.",
           weight: 0.4,
           options: [
             { text: "Die Aufgabenstellung wurde unzureichend umgesetzt", score: 1 },
@@ -49,6 +52,7 @@ export const evaluationConfig: EvaluationConfig = {
       criteria: {
         scientific_approach: {
           title: "Wissenschaftliches Vorgehen",
+          purpose: "Bewertet die Einhaltung wissenschaftlicher Standards in der Arbeit: nachvollziehbare und belegte Aussagen statt unbelegter Behauptungen, sachlich-neutrale Darstellung, klare Trennung zwischen eigener Leistung, Fremdleistung und Interpretation sowie ein kritischer Umgang mit den eigenen Ergebnissen und Grenzen der Arbeit.",
           weight: 0.2,
           options: [
             { text: "Das wissenschaftliche Vorgehen entspricht nicht den Standards", score: 1 },
@@ -60,6 +64,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         research_question: {
           title: "Fragestellung und Methodik",
+          purpose: "Bewertet, ob Forschungsfrage bzw. Zielsetzung in der Arbeit explizit formuliert und sinnvoll abgegrenzt sind und ob die gewählte Methodik erkennbar darauf abgestimmt und begründet ist. Anders als im Vorwort steht hier die Darstellung im Text im Vordergrund, nicht die Eignung des Vorgehens insgesamt.",
           weight: 0.2,
           options: [
             { text: "Fragestellung und methodisches Vorgehen sind nicht nachvollziehbar", score: 1 },
@@ -71,6 +76,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         related_work: {
           title: "Related Work",
+          purpose: "Bewertet die Einordnung der Arbeit in den bestehenden Forschungs- und Praxiskontext: Werden einschlägige verwandte Arbeiten erfasst, verglichen und wird die eigene Arbeit klar davon abgegrenzt? Eine bloße Aufzählung von Vorarbeiten ohne Bezug zur eigenen Fragestellung senkt die Bewertung.",
           weight: 0.2,
           options: [
             { text: "Die Einordnung in den Forschungskontext ist unzureichend", score: 1 },
@@ -82,6 +88,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         citation: {
           title: "Quellenarbeit",
+          purpose: "Bewertet Umfang, Qualität und Handhabung der verwendeten Quellen: Angemessenheit und Aktualität der Literatur, Anteil wissenschaftlicher Primärquellen gegenüber Web- und Sekundärquellen, korrekte und konsistente Zitierweise sowie vollständige Belege an den passenden Stellen.",
           weight: 0.2,
           options: [
             { text: "Die Quellenarbeit entspricht nicht wissenschaftlichen Standards", score: 1 },
@@ -93,6 +100,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         documentation: {
           title: "Darstellung der Durchführung",
+          purpose: "Bewertet, ob die praktische Durchführung so dokumentiert ist, dass sie nachvollziehbar und wiederholbar ist: ausreichende Angaben zu Aufbau, Daten, Werkzeugen und Parametern sowie verständliche Darstellung durch Abbildungen, Tabellen oder Auszüge. Fehlende Details, die eine Reproduktion verhindern, senken die Bewertung.",
           weight: 0.2,
           options: [
             { text: "Die Darstellung der Durchführung ist nicht nachvollziehbar", score: 1 },
@@ -111,6 +119,7 @@ export const evaluationConfig: EvaluationConfig = {
       criteria: {
         logical_structure: {
           title: "Logischer Aufbau",
+          purpose: "Bewertet die Kapitelfolge der Arbeit, so wie sie sich aus dem Inhaltsverzeichnis ergibt: Bauen die Kapitel sinnvoll aufeinander auf (Hinführung, Grundlagen, Methodik, Durchführung, Ergebnisse, Diskussion, Fazit) und ist der Aufbau auf die Fragestellung ausgerichtet? Bewertet wird die Anordnung der Kapitel, nicht die Argumentation im Fließtext, die unter Inhalt beurteilt wird.",
           weight: 0.4,
           options: [
             { text: "Der logische Aufbau weist deutliche Mängel auf", score: 1 },
@@ -122,6 +131,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         structuring: {
           title: "Strukturierung",
+          purpose: "Bewertet die Feingliederung innerhalb der Kapitel: sinnvolle Gliederungstiefe, ausgewogene Kapitelumfänge, thematisch passende Bündelung der Unterkapitel, aussagekräftige Überschriften sowie das Vermeiden von Redundanzen und inhaltlichen Überschneidungen zwischen Abschnitten.",
           weight: 0.4,
           options: [
             { text: "Die Strukturierung ist nicht nachvollziehbar", score: 1 },
@@ -133,6 +143,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         formal_quality: {
           title: "Formale Qualität",
+          purpose: "Bewertet die Vollständigkeit der üblichen Bestandteile einer Abschlussarbeit: Einleitung mit Zielsetzung, Grundlagen, Einordnung verwandter Arbeiten, Methodik, Durchführung, Evaluation bzw. Diskussion, Fazit und Ausblick sowie die erforderlichen Verzeichnisse und gegebenenfalls Anhänge. Bewertet wird das Vorhandensein und die korrekte Nummerierung dieser Elemente, nicht ihre inhaltliche Qualität.",
           weight: 0.2,
           options: [
             { text: "Die formale Qualität entspricht nicht den Anforderungen", score: 1 },
@@ -151,6 +162,7 @@ export const evaluationConfig: EvaluationConfig = {
       criteria: {
         argumentation: {
           title: "Argumentationsverlauf",
+          purpose: "Bewertet die inhaltliche Schlüssigkeit der Argumentation im Fließtext: Werden Aussagen hergeleitet statt gesetzt, sind Übergänge zwischen Abschnitten inhaltlich verbunden und zieht sich ein roter Faden von der Fragestellung bis zum Fazit? Bewertet wird die Gedankenführung im Text, nicht die Kapitelanordnung, die unter Gliederung beurteilt wird.",
           weight: 0.25,
           options: [
             { text: "Der Argumentationsverlauf ist nicht nachvollziehbar", score: 1 },
@@ -162,6 +174,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         fundamentals: {
           title: "Grundlagenverständnis",
+          purpose: "Bewertet, ob die fachlichen Grundlagen korrekt, in angemessener Tiefe und mit erkennbarem eigenem Verständnis dargestellt sind und ob sie gezielt auf die Fragestellung zugeschnitten sind. Eine breite, lehrbuchartige Wiedergabe ohne Bezug zur eigenen Arbeit oder erkennbare Lücken bei zentralen Konzepten senken die Bewertung.",
           weight: 0.25,
           options: [
             { text: "Das Grundlagenverständnis weist deutliche Lücken auf", score: 1 },
@@ -173,6 +186,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         implementation: {
           title: "Durchführung/Umsetzung",
+          purpose: "Bewertet die methodische Qualität der tatsächlichen Durchführung: saubere Anwendung der gewählten Methodik, begründete Entscheidungen bei Konzeption und Umsetzung, angemessene Umsetzungstiefe und durchgehender Bezug zur Forschungsfrage. Anders als bei der Darstellung der Durchführung unter Form geht es hier um das inhaltliche Vorgehen selbst, nicht um dessen Dokumentation, und anders als bei der Umsetzung der Aufgabenstellung im Vorwort um die Qualität statt um den Abdeckungsgrad.",
           weight: 0.25,
           options: [
             { text: "Die Durchführung weist grundlegende methodische Mängel auf", score: 1 },
@@ -184,6 +198,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         evaluation: {
           title: "Evaluation/Diskussion",
+          purpose: "Bewertet, ob die erzielten Ergebnisse systematisch ausgewertet, kritisch eingeordnet und auf die Forschungsfrage zurückbezogen werden: nachvollziehbare Bewertungskriterien, Interpretation statt bloßer Ergebnisauflistung, Diskussion von Grenzen und Störfaktoren sowie ein daraus abgeleiteter Ausblick.",
           weight: 0.25,
           options: [
             { text: "Die Evaluation und Diskussion der Ergebnisse ist unzureichend", score: 1 },
@@ -195,6 +210,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         complexity: {
           title: "Komplexität/Verständnis",
+          purpose: "Bonuskriterium: Bewertet wird, wie anspruchsvoll das bearbeitete Thema war und wie souverän der Studierende mit dieser Komplexität umgegangen ist, etwa durch eigenständige Lösungsansätze oder Leistungen deutlich über den Standardanforderungen. Dient der ergänzenden Würdigung besonders komplexer Themen und wird nur vergeben, wenn ein erhöhter Schwierigkeitsgrad tatsächlich erkennbar ist; ein niedriger Wert ist kein Mangel, sondern bedeutet lediglich einen geringeren Bonus.",
           weight: 0.25,
           excludeFromTotal: true,
           options: [
@@ -263,6 +279,7 @@ export const defaultTemplates: DefaultTemplate[] = [
                         ...evaluationConfig.sections.preface.criteria,
                         implementation: {
                             ...evaluationConfig.sections.preface.criteria.implementation,
+                            purpose: "Bewertet, ob die gestellte Aufgabe im erwarteten Umfang praktisch umgesetzt wurde, mit Schwerpunkt auf der technischen Lösung: Funktionsfähigkeit des Ergebnisses, Abdeckung der geforderten Funktionen und erkennbare Problemlösungskompetenz bei technischen Hürden. Lücken gegenüber der Aufgabenstellung senken die Bewertung, sinnvolle technische Erweiterungen heben sie an.",
                             options: [
                                 { text: "Die technische Umsetzung weist grundlegende Mängel auf", score: 1 },
                                 { text: "Die technische Umsetzung erfüllt grundlegende Anforderungen", score: 2 },
@@ -279,6 +296,7 @@ export const defaultTemplates: DefaultTemplate[] = [
                         ...evaluationConfig.sections.form.criteria,
                         scientific_approach: {
                             ...evaluationConfig.sections.form.criteria.scientific_approach,
+                            purpose: "Bewertet, ob die Arbeit einem erkennbar systematischen Vorgehen folgt: nachvollziehbare Schritte von der Analyse über Konzeption und Umsetzung bis zur Überprüfung, begründete statt beiläufiger Entscheidungen sowie eine sachliche, belegte Darstellung. Auf Bachelorniveau steht die saubere Systematik im Vordergrund, nicht eigenständige Forschungsmethodik.",
                             options: [
                                 { text: "Das systematische Vorgehen ist nicht erkennbar", score: 1 },
                                 { text: "Das systematische Vorgehen ist teilweise erkennbar", score: 2 },
@@ -289,6 +307,7 @@ export const defaultTemplates: DefaultTemplate[] = [
                         },
                         citation: {
                             ...evaluationConfig.sections.form.criteria.citation,
+                            purpose: "Bewertet Umfang und Handhabung der verwendeten Quellen: Werden für die zentralen Aussagen überhaupt Quellen herangezogen, sind diese fachlich einschlägig und ist die Zitierweise korrekt, konsistent und vollständig? Erwartet wird eine solide Belegpraxis, nicht die vollständige Erfassung des Forschungsstands.",
                             options: [
                                 { text: "Quellen werden kaum verwendet, die Zitierung ist fehlerhaft", score: 1 },
                                 { text: "Grundlegende Quellen werden verwendet, die Zitierung weist Mängel auf", score: 2 },
@@ -314,6 +333,7 @@ export const defaultTemplates: DefaultTemplate[] = [
                         ...evaluationConfig.sections.preface.criteria,
                         implementation: {
                             ...evaluationConfig.sections.preface.criteria.implementation,
+                            purpose: "Bewertet, ob die gestellte Aufgabe im erwarteten Umfang bearbeitet wurde, mit Schwerpunkt auf der methodischen Umsetzung: Ist das gewählte Vorgehen geeignet, die Forschungsfrage tatsächlich zu validieren, und wurde es in diesem Sinne konsequent durchgeführt? Lücken gegenüber der Aufgabenstellung senken die Bewertung, tragfähige eigene Erweiterungen des Untersuchungsdesigns heben sie an.",
                             options: [
                                 { text: "Die methodische Umsetzung validiert die Forschungsfrage nicht", score: 1 },
                                 { text: "Die methodische Umsetzung validiert die Forschungsfrage nur teilweise", score: 2 },
@@ -330,6 +350,7 @@ export const defaultTemplates: DefaultTemplate[] = [
                         ...evaluationConfig.sections.form.criteria,
                         scientific_approach: {
                             ...evaluationConfig.sections.form.criteria.scientific_approach,
+                            purpose: "Bewertet die wissenschaftliche Methodik der Arbeit: bewusste Wahl und Begründung eines anerkannten Forschungsdesigns, saubere Trennung von Beobachtung, Interpretation und Wertung, kritischer Umgang mit den eigenen Ergebnissen sowie eigenständige methodische Ansätze über die reine Anwendung von Standardverfahren hinaus.",
                             options: [
                                 { text: "Die wissenschaftliche Methodik ist nicht erkennbar", score: 1 },
                                 { text: "Die wissenschaftliche Methodik ist grundlegend erkennbar", score: 2 },
@@ -340,6 +361,7 @@ export const defaultTemplates: DefaultTemplate[] = [
                         },
                         citation: {
                             ...evaluationConfig.sections.form.criteria.citation,
+                            purpose: "Bewertet die Erfassung des Forschungsstands über die Literatur: Breite und Aktualität der herangezogenen Arbeiten, Anteil wissenschaftlicher Primärquellen sowie präzise und konsistente Zitierung. Anders als bei Related Work geht es hier um Auswahl, Abdeckung und Belegqualität der Literatur, nicht um die inhaltliche Abgrenzung der eigenen Arbeit gegenüber verwandten Arbeiten.",
                             options: [
                                 { text: "Der Forschungsstand wird unzureichend erfasst", score: 1 },
                                 { text: "Der Forschungsstand wird grundlegend erfasst", score: 2 },
