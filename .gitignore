@@ -38,3 +38,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Institution assets, not part of this repository
+logo.svg
+example.pdf
+master.pdf

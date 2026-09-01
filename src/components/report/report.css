@@ -1,0 +1,259 @@
+/**
+ * Layout of the printed Gutachten.
+ *
+ * Deliberately plain CSS instead of Tailwind: the same markup is used for the
+ * on-screen preview and for printing, and the sizes are in mm/pt so that what the
+ * preview shows is what the printer lays out.
+ */
+
+ :root {
+    --muted: #AAA;
+ }
+
+.report {
+    /* A4 minus the page margins configured in @page below. */
+    width: 170mm;
+    margin: 0 auto;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    line-height: 1.35;
+    color: #000;
+    background: #fff;
+}
+
+.report__logo {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10mm;
+}
+
+.report__logo img {
+    width: 52mm;
+    height: auto;
+}
+
+.report__title {
+    font-size: 17pt;
+    font-weight: normal;
+    text-decoration: underline;
+    margin: 0 0 8mm;
+}
+
+.report__header {
+    margin-bottom: 8mm;
+}
+
+.report__row {
+    display: flex;
+    gap: 6mm;
+    margin-bottom: 2mm;
+}
+
+.report__row > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.report__label {
+    font-weight: bold;
+}
+
+.report__value {
+    margin-left: 1mm;
+}
+
+/* Everything the evaluator has not filled in yet is printed as a grey hint. */
+.report__value--empty {
+    color: #808080;
+}
+
+.report__heading {
+    font-weight: bold;
+    margin: 6mm 0 3mm;
+}
+
+.report__field {
+    margin-bottom: 4mm;
+    /* Keep a label and its text on the same page. */
+    break-inside: avoid;
+}
+
+.report__field-label {
+    text-decoration: underline;
+    margin-bottom: 0.5mm;
+}
+
+.report__field-text {
+    white-space: pre-wrap;
+    text-align: justify;
+}
+
+.report__checkboxes {
+    margin: 10mm 0 6mm;
+    break-inside: avoid;
+}
+
+.report__checkbox {
+    margin-bottom: 1.5mm;
+}
+
+.report__checkbox-box {
+    display: inline-block;
+    width: 3.4mm;
+    height: 3.4mm;
+    margin-right: 1.5mm;
+    border: 0.25mm solid #000;
+    /* Keeps the box on the text baseline instead of riding above it. */
+    vertical-align: -0.4mm;
+    line-height: 3.2mm;
+    text-align: center;
+    font-size: 7pt;
+    font-weight: bold;
+}
+
+.report__checkbox-note {
+    font-size: 8pt;
+    margin-left: 4.5mm;
+}
+
+.report__grade {
+    display: flex;
+    align-items: flex-end;
+    gap: 8mm;
+    margin: 6mm 0 14mm;
+    break-inside: avoid;
+}
+
+.report__grade-label {
+    font-size: 13pt;
+    font-weight: bold;
+}
+
+.report__grade-line {
+    flex: 1 1 auto;
+    max-width: 70mm;
+    border-bottom: 1px solid #000;
+    text-align: center;
+    padding-bottom: 0.5mm;
+}
+
+.report__grade-box {
+    width: 25mm;
+    height: 11mm;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13pt;
+}
+
+.report__signatures {
+    display: flex;
+    gap: 8mm;
+    margin-bottom: 10mm;
+    break-inside: avoid;
+}
+
+.report__signature {
+    flex: 1 1 0;
+}
+
+.report__signature-line {
+    border-top: 1px solid #000;
+    padding-top: 1mm;
+}
+
+.report__signature-note {
+    font-size: 8pt;
+}
+
+.report__confirmation {
+    font-weight: bold;
+    margin: 8mm 0 10mm;
+}
+
+.report__footer {
+    margin-top: 14mm;
+    font-size: 8pt;
+    break-inside: avoid;
+}
+
+.report__footer-scale {
+    font-weight: bold;
+    margin-bottom: 3mm;
+}
+
+.report__footer-scale span {
+    font-weight: normal;
+}
+
+.report__footer-meta {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* --- preview ------------------------------------------------------------- */
+
+.report-preview {
+    background: #f3f4f6;
+    padding: 8mm 0;
+}
+
+.report-preview .report {
+    /* Same page margins as @page, so the preview shows the printed line breaks. */
+    padding: 28mm 20mm 32mm;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    /* Full A4 width so the preview matches the printed page. */
+    width: 210mm;
+}
+
+/* --- print --------------------------------------------------------------- */
+
+/* The print copy lives in a portal on <body> and is only visible while printing. */
+.print-root {
+    display: none;
+}
+
+@media print {
+    /*
+     * Running header and footer.
+     *
+     * Chromium only repeats content on every page when it sits in an @page margin
+     * box (elements taken out of the flow with position: fixed are painted once,
+     * wherever the flow left them). The page margins below reserve the space for
+     * them; what they contain is emitted by ReportDocument, because the logo, the
+     * grade scale and the revision come from the report definition.
+     */
+    @page {
+        size: A4;
+        margin: 32mm 20mm 24mm;
+    }
+
+    /* Print the report only, whatever else the app currently has open. */
+    body > *:not(.print-root) {
+        display: none !important;
+    }
+
+    body {
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #fff !important;
+    }
+
+    .print-root {
+        display: block !important;
+    }
+
+    .print-root .report {
+        width: auto;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    /* On paper these are drawn by the margin boxes on every page. */
+    .report__logo,
+    .report__footer {
+        display: none;
+    }
+}

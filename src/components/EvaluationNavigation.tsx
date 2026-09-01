@@ -13,7 +13,8 @@ import {
   BarChart2,
   ClipboardList,
   StickyNote,
-  Info
+  Info,
+  Printer
 } from 'lucide-react';
 import { cn } from "@/lib/utils/misc";
 import { Section } from '@/lib/types/types';
@@ -24,6 +25,7 @@ import CriteriaOverview from './dialogs/CriteriaOverview';
 import NotesDialog from './dialogs/NotesDialog';
 import ThesisInfoDialog from './dialogs/ThesisInfoDialog';
 import EditableTextDialog from './dialogs/EditableTextDialog';
+import ReportDialog from './dialogs/ReportDialog';
 
 
 interface NavigationProps {
@@ -57,6 +59,7 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
   const [showCriteriaOverview, setShowCriteriaOverview] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [showThesisInfo, setShowThesisInfo] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   // Calculate total score using normalized section scores (properly handles bonus)
   const score = useMemo(() => {
@@ -233,6 +236,15 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
           <ClipboardList className="h-4 w-4 mr-2" />
           Kriterienübersicht
         </Button>
+
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => setShowReport(true)}
+        >
+          <Printer className="h-4 w-4 mr-2" />
+          Gutachten
+        </Button>
       </div>
 
 
@@ -258,6 +270,11 @@ const EvaluationNavigation: React.FC<NavigationProps> = ({
       <NotesDialog
           isOpen={showNotes}
           onClose={() => setShowNotes(false)}
+      />
+
+      <ReportDialog
+          isOpen={showReport}
+          onClose={() => setShowReport(false)}
       />
 
       {/* Complete Text Dialog with View/Edit modes */}

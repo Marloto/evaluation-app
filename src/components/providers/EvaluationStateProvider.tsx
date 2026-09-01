@@ -18,6 +18,17 @@ interface SectionState {
 export interface ThesisInfo {
     title: string;
     abstract: string;
+    // Only used by the printed report; optional so older saved states still load.
+    students?: string;
+    program?: string;
+    firstExaminer?: string;
+    secondExaminer?: string;
+    issueDate?: string;
+    submissionDate?: string;
+    /** Ticked checkboxes of the report, keyed by ReportCheckbox.id. */
+    reportChecks?: Record<string, boolean>;
+    /** Picked values for the {choice} placeholders, keyed by ReportCheckbox.id. */
+    reportChoices?: Record<string, string>;
 }
 
 export interface EvaluationState {
@@ -27,7 +38,18 @@ export interface EvaluationState {
     thesisInfo?: ThesisInfo;
 }
 
-export const EMPTY_THESIS_INFO: ThesisInfo = { title: '', abstract: '' };
+export const EMPTY_THESIS_INFO: ThesisInfo = {
+    title: '',
+    abstract: '',
+    students: '',
+    program: '',
+    firstExaminer: '',
+    secondExaminer: '',
+    issueDate: '',
+    submissionDate: '',
+    reportChecks: {},
+    reportChoices: {}
+};
 
 interface EvaluationContextType {
     state: EvaluationState;

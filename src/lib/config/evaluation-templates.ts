@@ -232,15 +232,20 @@ export const createDefaultTemplate = (
     id: string,
     name: string,
     description: string,
+    reportType: string,
     configModifications: Partial<EvaluationConfig>
 ): DefaultTemplate => ({
     id,
     name,
     description,
+    reportType,
     type: 'default',
     version: '1.0',
     lastUpdated: new Date().toISOString(),
     config: {
+        // The report type travels with the config so a loaded template still knows
+        // which Gutachten it is printed as after a reload or an import.
+        reportType,
         sections: {
             ...evaluationConfig.sections,
             ...configModifications.sections
@@ -259,6 +264,7 @@ export const createSavedTemplate = (
     id: `template-${Date.now()}`,
     name,
     description,
+    reportType: config.reportType,
     type: 'saved',
     createdAt: new Date().toISOString(),
     modifiedAt: new Date().toISOString(),
@@ -271,6 +277,7 @@ export const defaultTemplates: DefaultTemplate[] = [
         'bachelor',
         'Bachelor Thesis',
         'Standard template for Bachelor thesis evaluation with focus on technical implementation',
+        'bachelor',
         {
             sections: {
                 preface: {
@@ -325,6 +332,7 @@ export const defaultTemplates: DefaultTemplate[] = [
         'master',
         'Master Thesis',
         'Standard template for Master thesis evaluation with focus on research methodology',
+        'master',
         {
             sections: {
                 preface: {

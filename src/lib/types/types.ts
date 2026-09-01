@@ -24,6 +24,12 @@ export interface Option {
 
 export interface EvaluationConfig {
     sections: { [key: string]: Section };
+    /**
+     * Which report ("Gutachten") this configuration is printed as. Copied from the
+     * template the config was loaded from, so it survives export/import and reloads.
+     * Unknown or missing ids fall back to the first report definition.
+     */
+    reportType?: string;
 }
 
 export interface GradeThreshold {
@@ -42,6 +48,8 @@ export interface BaseTemplate {
     id: string;
     name: string;
     description: string;
+    /** Report definition this template is evaluated for, see report-templates.ts. */
+    reportType?: string;
     config: EvaluationConfig;
 }
 
