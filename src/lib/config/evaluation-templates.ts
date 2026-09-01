@@ -143,7 +143,7 @@ export const evaluationConfig: EvaluationConfig = {
         },
         formal_quality: {
           title: "Formale Qualität",
-          purpose: "Bewertet die Vollständigkeit der üblichen Bestandteile einer Abschlussarbeit: Einleitung mit Zielsetzung, Grundlagen, Einordnung verwandter Arbeiten, Methodik, Durchführung, Evaluation bzw. Diskussion, Fazit und Ausblick sowie die erforderlichen Verzeichnisse und gegebenenfalls Anhänge. Bewertet wird das Vorhandensein und die korrekte Nummerierung dieser Elemente, nicht ihre inhaltliche Qualität.",
+          purpose: "Bewertet die formal-handwerkliche Vollständigkeit der Arbeit: Sind die üblichen Verzeichnisse (Inhalt, Abbildungen, Tabellen, Abkürzungen, Literatur) vorhanden und korrekt geführt, ist die Kapitelnummerierung durchgängig und konsistent, und sind Anhänge, sofern nötig, ordnungsgemäß eingebunden? Bewertet wird die technisch-formale Ausführung dieser Elemente, nicht ob die zugehörigen Kapitel inhaltlich an der richtigen Stelle stehen oder in sich sinnvoll aufgebaut sind.",
           weight: 0.2,
           options: [
             { text: "Die formale Qualität entspricht nicht den Anforderungen", score: 1 },
